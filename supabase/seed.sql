@@ -1,0 +1,2 @@
+-- Dados de desenvolvimento local, aplicados em `npm run db:reset`.
+-- Não use dados reais aqui: este arquivo vai para o repositório.

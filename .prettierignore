@@ -1,0 +1,11 @@
+node_modules/
+package-lock.json
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/ios/
+apps/mobile/android/
+apps/mobile/expo-env.d.ts
+supabase/.temp/
+supabase/.branches/
+*.pdf
+*.png
