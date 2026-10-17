@@ -8,6 +8,7 @@
     "mobile": "npm run start -w @destrava/mobile",
     "lint": "npm run lint -w @destrava/mobile",
     "typecheck": "npm run typecheck -w @destrava/mobile",
+    "test": "npm run test -w @destrava/mobile",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:start": "supabase start",
@@ -21,5 +22,10 @@
   "devDependencies": {
     "prettier": "^3.9.10",
     "supabase": "^2.120.0"
+  },
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-test-renderer": "19.2.3"
   }
 }
