@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
+import { SubjectsList } from '@/features/subjects/components/subjects-list';
 import { colors, radius, spacing } from '@/theme';
 
 export default function HomeScreen() {
@@ -13,6 +14,11 @@ export default function HomeScreen() {
         Encontre professores verificados na sua região, compare avaliações e peça contato com
         segurança.
       </Text>
+
+      <View style={styles.section}>
+        <Text variant="label">Matérias com reforço</Text>
+        <SubjectsList />
+      </View>
 
       <View style={styles.placeholder}>
         <Ionicons name="location-outline" size={32} color={colors.primary} />
@@ -26,6 +32,10 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  section: {
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
   placeholder: {
     alignItems: 'center',
     gap: spacing.sm,
