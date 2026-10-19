@@ -9,3 +9,7 @@ node_modules/
 # Sistema
 .DS_Store
 *.log
+
+CLAUDE.md
+.claude/
+telas/
