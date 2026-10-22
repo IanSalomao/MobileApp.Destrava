@@ -9,6 +9,7 @@
     "lint": "npm run lint -w @destrava/mobile",
     "typecheck": "npm run typecheck -w @destrava/mobile",
     "test": "npm run test -w @destrava/mobile",
+    "test:db": "supabase test db",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:start": "supabase start",
