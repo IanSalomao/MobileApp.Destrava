@@ -14,13 +14,7 @@
     "test:watch": "jest --watch"
   },
   "jest": {
-    "preset": "jest-expo",
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
-    ]
+    "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -54,9 +48,10 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@testing-library/react-native": "^13.0.0",
+    "@react-native/jest-preset": "^0.88.0",
+    "@testing-library/react-native": "^13.3.3",
     "@types/aes-js": "^3.1.4",
-    "@types/jest": "29.5.14",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.2.2",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~57.0.2",
