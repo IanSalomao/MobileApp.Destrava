@@ -1,0 +1,5 @@
+# Barra o commit quando há erro de lint ou de tipos (card de quality gates).
+# lint-staged roda o ESLint nos arquivos staged; o typecheck roda no projeto
+# todo. O && garante que falha em qualquer etapa aborta o commit.
+npx lint-staged &&
+npm run typecheck
