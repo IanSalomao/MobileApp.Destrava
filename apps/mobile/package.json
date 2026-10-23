@@ -10,11 +10,6 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest --forceExit",
-    "test:watch": "jest --watch"
-  },
-  "jest": {
-    "preset": "jest-expo"
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --forceExit"
