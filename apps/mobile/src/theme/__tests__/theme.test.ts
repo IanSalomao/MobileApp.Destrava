@@ -30,3 +30,9 @@ export function assertThemeIntegrity(): void {
     throw new Error('Objeto theme principal incompleto.');
   }
 }
+
+describe('UI-01: Theme Tokens', () => {
+  it('valida a integridade de todos os tokens do tema', () => {
+    expect(() => assertThemeIntegrity()).not.toThrow();
+  });
+});
