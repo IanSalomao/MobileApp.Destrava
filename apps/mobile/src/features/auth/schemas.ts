@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { USER_ROLES } from '@/features/profile/types';
+import { USER_ROLES, type UserRole } from '@/features/profile/types';
 
 // Mesmo mínimo configurado em supabase/config.toml (auth.minimum_password_length).
 export const MIN_PASSWORD_LENGTH = 8;
@@ -23,3 +23,8 @@ export const signUpSchema = z.object({
 
 export type SignInInput = z.infer<typeof signInSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
+
+// Perfil vindo da rota (/sign-up?role=teacher). Valor ausente ou inválido = sem pré-seleção.
+export function parseRoleParam(value: unknown): UserRole | undefined {
+  return USER_ROLES.find((role) => role === value);
+}
