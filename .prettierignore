@@ -1,6 +1,7 @@
 node_modules/
 package-lock.json
 apps/mobile/.expo/
+apps/mobile/coverage/
 apps/mobile/dist/
 apps/mobile/ios/
 apps/mobile/android/

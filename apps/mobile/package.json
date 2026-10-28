@@ -10,9 +10,9 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --forceExit"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage --forceExit"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -46,11 +46,12 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@react-native/jest-preset": "^0.88.0",
+    "@react-native/jest-preset": "^0.86.3",
     "@testing-library/react-native": "^13.3.3",
     "@types/aes-js": "^3.1.4",
     "@types/jest": "^29.5.14",
     "@types/react": "~19.2.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~57.0.2",
     "eslint-config-prettier": "^10.1.8",

@@ -69,7 +69,7 @@ select has_enum('public', 'contact_request_status', 'enum contact_request_status
 select enum_has_labels(
   'public',
   'contact_request_status',
-  array['pending', 'accepted', 'declined', 'expired'],
+  array['pending', 'accepted', 'declined', 'expired', 'cancelled'],
   'labels de contact_request_status'
 );
 
