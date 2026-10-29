@@ -3,36 +3,29 @@ import { colors, spacing, radius, typography, layout, theme } from '../index';
 
 const VALID_COLOR_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$|^rgba?\(/;
 
-export function assertThemeIntegrity(): void {
-  // 1. Nenhuma cor vazia ou fora do padrão hexadecimal/rgba
-  for (const [key, value] of Object.entries(colors)) {
-    if (!VALID_COLOR_REGEX.test(value)) {
-      throw new Error(`Token de cor inválido em colors.${key}: ${value}`);
+describe('UI-01: Theme Integrity & Tokens Contract', () => {
+  it('deve garantir que nenhuma cor seja vazia ou esteja fora do formato hexadecimal/rgba', () => {
+    for (const [key, value] of Object.entries(colors)) {
+      expect(value).toMatch(VALID_COLOR_REGEX);
     }
-  }
+  });
 
-  // 2. Garantir requisito de área mínima de toque (>= 44pt)
-  if (layout.minTouchTarget < 44) {
-    throw new Error(`minTouchTarget deve ser >= 44pt, recebido: ${layout.minTouchTarget}`);
-  }
+  it('deve garantir requisito de área mínima de toque (>= 44pt)', () => {
+    expect(layout.minTouchTarget).toBeGreaterThanOrEqual(44);
+  });
 
-  // 3. Garantir progressão positiva de espaçamentos e raios
-  if (!(spacing.xs < spacing.sm && spacing.sm < spacing.md && spacing.md < spacing.lg)) {
-    throw new Error('Escala de spacing inconsistente.');
-  }
+  it('deve garantir progressão positiva de espaçamentos e raios', () => {
+    expect(spacing.xs).toBeLessThan(spacing.sm);
+    expect(spacing.sm).toBeLessThan(spacing.md);
+    expect(spacing.md).toBeLessThan(spacing.lg);
 
-  if (!(radius.sm < radius.md && radius.md < radius.lg && radius.lg < radius.full)) {
-    throw new Error('Escala de radius inconsistente.');
-  }
+    expect(radius.sm).toBeLessThan(radius.md);
+    expect(radius.md).toBeLessThan(radius.lg);
+    expect(radius.lg).toBeLessThan(radius.full);
+  });
 
-  // 4. Garantir que o objeto theme agrega todas as dimensões
-  if (theme.colors.primary !== '#1B7F4E' || !theme.typography.title.fontSize) {
-    throw new Error('Objeto theme principal incompleto.');
-  }
-}
-
-describe('UI-01: Theme Tokens', () => {
-  it('valida a integridade de todos os tokens do tema', () => {
-    expect(() => assertThemeIntegrity()).not.toThrow();
+  it('deve garantir que o objeto theme agrega todas as dimensões e valores principais', () => {
+    expect(theme.colors.primary).toBe('#1B7F4E');
+    expect(theme.typography.title.fontSize).toBeDefined();
   });
 });
