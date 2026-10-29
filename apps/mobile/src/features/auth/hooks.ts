@@ -2,6 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
+import type { UserRole } from '@/features/profile/types';
+
 import { defaultAuthRepository, signOut, signUp, type AuthRepository } from './api';
 import { getAuthErrorMessage } from './errors';
 import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from './schemas';
@@ -27,10 +29,10 @@ export function useSignInForm(repository: AuthRepository = defaultAuthRepository
   };
 }
 
-export function useSignUpForm() {
+export function useSignUpForm(initialRole?: UserRole) {
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { fullName: '', email: '', password: '', role: undefined },
+    defaultValues: { fullName: '', email: '', password: '', role: initialRole },
   });
   const mutation = useMutation({ mutationFn: signUp });
 

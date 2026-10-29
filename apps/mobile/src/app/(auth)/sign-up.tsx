@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import { FormTextField } from '@/components/form/form-text-field';
 import { Button } from '@/components/ui/button';
@@ -6,10 +6,13 @@ import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { RoleField } from '@/features/auth/components/role-field';
 import { useSignUpForm } from '@/features/auth/hooks';
-import { MIN_PASSWORD_LENGTH } from '@/features/auth/schemas';
+import { MIN_PASSWORD_LENGTH, parseRoleParam } from '@/features/auth/schemas';
 
 export default function SignUpScreen() {
-  const { control, submit, isSubmitting, errorMessage, needsEmailConfirmation } = useSignUpForm();
+  const { role } = useLocalSearchParams<{ role?: string }>();
+  const { control, submit, isSubmitting, errorMessage, needsEmailConfirmation } = useSignUpForm(
+    parseRoleParam(role),
+  );
 
   if (needsEmailConfirmation) {
     return (
