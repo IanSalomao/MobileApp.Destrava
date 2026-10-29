@@ -4,13 +4,20 @@ import { supabase } from '@/lib/supabase';
 
 import type { SignInInput, SignUpInput } from './schemas';
 
+export interface AuthRepository {
+  signIn(credentials: SignInInput): Promise<unknown>;
+}
+
 export async function signIn({ email, password }: SignInInput) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
 
-/** role e full_name vão nos metadados; o trigger handle_new_user cria o perfil com eles. */
+export const defaultAuthRepository: AuthRepository = {
+  signIn,
+};
+
 export async function signUp({ fullName, email, password, role }: SignUpInput) {
   const { data, error } = await supabase.auth.signUp({
     email,
