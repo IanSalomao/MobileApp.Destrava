@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
-import { signIn, signOut, signUp } from './api';
+import { defaultAuthRepository, signOut, signUp, type AuthRepository } from './api';
 import { getAuthErrorMessage } from './errors';
 import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from './schemas';
 
@@ -10,12 +10,14 @@ import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from '
 // A tela só renderiza o que vem daqui. Ao logar, o SessionProvider recebe a sessão
 // e o Stack.Protected do layout raiz tira o usuário do fluxo de auth.
 
-export function useSignInForm() {
+export function useSignInForm(repository: AuthRepository = defaultAuthRepository) {
   const form = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: '', password: '' },
   });
-  const mutation = useMutation({ mutationFn: signIn });
+  const mutation = useMutation({
+    mutationFn: (values: SignInInput) => repository.signIn(values),
+  });
 
   return {
     control: form.control,
