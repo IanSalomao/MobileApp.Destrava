@@ -59,12 +59,7 @@ export function TextField({
     <View style={[styles.container, containerStyle]}>
       {label ? <Text variant="label">{label}</Text> : null}
 
-      <View
-        style={[
-          styles.inputWrapper,
-          resolvedError ? styles.inputError : null,
-        ]}
-      >
+      <View style={[styles.inputWrapper, resolvedError ? styles.inputError : null]}>
         {leftIcon ? <View style={styles.leftIcon}>{leftIcon}</View> : null}
 
         <TextInput
@@ -81,9 +76,7 @@ export function TextField({
           <Pressable
             testID="password-visibility-toggle"
             accessibilityRole="button"
-            accessibilityLabel={
-              isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'
-            }
+            accessibilityLabel={isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'}
             onPress={() => setIsPasswordVisible((prev) => !prev)}
             style={styles.passwordToggle}
           >

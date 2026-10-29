@@ -953,7 +953,7 @@ export type Database = {
       };
     };
     Enums: {
-      contact_request_status: 'pending' | 'accepted' | 'declined' | 'expired';
+      contact_request_status: 'pending' | 'accepted' | 'declined' | 'expired' | 'cancelled';
       day_period: 'morning' | 'afternoon' | 'evening';
       education_level: 'elementary_early' | 'elementary_late' | 'high_school';
       notification_type:
@@ -1098,7 +1098,7 @@ export const Constants = {
   },
   public: {
     Enums: {
-      contact_request_status: ['pending', 'accepted', 'declined', 'expired'],
+      contact_request_status: ['pending', 'accepted', 'declined', 'expired', 'cancelled'],
       day_period: ['morning', 'afternoon', 'evening'],
       education_level: ['elementary_early', 'elementary_late', 'high_school'],
       notification_type: [
