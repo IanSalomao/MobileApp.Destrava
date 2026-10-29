@@ -11,13 +11,23 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)',
   ],
-  // Cobertura: no MVVM a lógica testável mora em api.ts (Model) e hooks.ts
-  // (ViewModel). Coletamos e cobramos só as features que já têm teste.
-  collectCoverageFrom: ['src/features/subjects/api.ts', 'src/features/subjects/hooks.ts'],
+  // Cobertura: no MVVM a lógica testável mora em api.ts (Model), hooks.ts
+  // (ViewModel) e no domínio puro. Coletamos e cobramos só o que já tem teste.
+  collectCoverageFrom: [
+    'src/features/contact-requests/domain/contact-request.ts',
+    'src/features/subjects/api.ts',
+    'src/features/subjects/hooks.ts',
+  ],
   // Gate: a lógica das features COM teste precisa de >= 80%. Ao cobrir uma
   // feature nova, adicione o api.ts e o hooks.ts dela em collectCoverageFrom e
   // aqui (ex.: './src/features/contact-requests/api.ts').
   coverageThreshold: {
+    './src/features/contact-requests/domain/contact-request.ts': {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
+    },
     './src/features/subjects/api.ts': {
       branches: 80,
       functions: 80,

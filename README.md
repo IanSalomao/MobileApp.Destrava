@@ -228,7 +228,7 @@ O schema fica em `supabase/migrations/`, uma migração por domínio. Todas as t
 | Verificação         | `teacher_verifications` (CPF e status), `teacher_documents` (arquivos no bucket privado)     |
 | Assinatura          | `subscription_plans`, `subscriptions`, `subscription_payments` (cobranças simuladas)         |
 | Responsáveis        | `students` (filhos), `student_subjects`, `favorite_teachers`                                 |
-| Contato e avaliação | `contact_requests` (`pending` → `accepted`, `declined` ou `expired`), `reviews`              |
+| Contato e avaliação | `contact_requests` (`pending` → `accepted`, `declined`, `expired` ou `cancelled`), `reviews` |
 | Notificações        | `notifications` (geradas por triggers, entregues em tempo real)                              |
 
 A busca é a função `search_teachers` (raio com PostGIS, cidade, texto, matéria, idioma, preço, tipo de aula e dias). Dois jobs do pg_cron rodam a cada 15 minutos: um encerra testes grátis e registra as mensalidades simuladas, o outro expira solicitações sem resposta em 24 horas.
