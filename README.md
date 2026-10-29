@@ -47,15 +47,15 @@ O Destrava junta os dois lados numa plataforma só, com foco em **confiança e c
 | RF06   | Exibir no perfil do professor a nota média e a quantidade total de avaliações recebidas.                                                                                 |
 | RF07   | Permitir que o pai solicite contato com um professor por formulário (dados do responsável, do filho e motivo do reforço).                                                |
 | RF08   | Permitir que o professor aceite ou recuse uma solicitação de contato recebida.                                                                                           |
-| RF09   | Liberar o contato por WhatsApp entre pai e professor somente após o aceite da solicitação.                                                                               |
-| RF10   | Permitir que pai e professor abram uma conversa no WhatsApp um com o outro, a partir do app, após o aceite.                                                              |
+| RF09   | Liberar o número de WhatsApp de cada lado para o outro somente após o professor aceitar a solicitação; antes do aceite nenhum dos dois vê o número.                      |
+| RF10   | Exibir, após o aceite, um botão "Conversar no WhatsApp" que abre a conversa por link `wa.me` com mensagem inicial pré-preenchida; o app não tem chat próprio.            |
 | RF11   | Liberar o link de rede social do professor somente após o aceite da solicitação.                                                                                         |
 | RF12   | Permitir que o pai avalie o professor com nota (obrigatória) e comentário (opcional) após a aula.                                                                        |
 | RF13   | Processar a cobrança da assinatura do professor, incluindo o controle do período de teste gratuito.                                                                      |
-| RF14   | Exibir para o pai uma aba com todos os contatos já liberados.                                                                                                            |
-| RF15   | Exibir para o professor uma aba com todas as solicitações e contatos recebidos.                                                                                          |
+| RF14   | Exibir para o pai a lista "Minhas solicitações", com o status de cada uma (pendente, aceita, recusada ou expirada) e o botão do WhatsApp nas aceitas.                    |
+| RF15   | Exibir para o professor a lista "Solicitações recebidas", com aceitar e recusar nas pendentes e o botão do WhatsApp nas aceitas.                                         |
 
-> **Mudanças em relação à apresentação:** o chat interno previsto originalmente (RF09, RF10, RF14 e RF15) foi substituído por um botão que abre o WhatsApp, liberado só depois do aceite. No MVP, a cobrança da assinatura (RF13) e a verificação de identidade (RF02) são **simuladas**: o fluxo funciona de ponta a ponta (teste grátis, cobrança mensal, cancelamento, aprovação do cadastro), mas nenhum pagamento real acontece e o documento é aprovado no envio.
+> **Mudanças em relação à apresentação:** o chat interno previsto originalmente (RF09, RF10, RF14 e RF15) foi substituído por um botão que abre o WhatsApp, liberado só depois do aceite. A mudança reduz o escopo do MVP (sem mensageria própria, moderação de conteúdo ou armazenamento de conversas) e mantém o número de telefone protegido até o professor aceitar, o que dá mais privacidade a famílias e professores. Por isso o Supabase Realtime também saiu da arquitetura. No MVP, a cobrança da assinatura (RF13) e a verificação de identidade (RF02) são **simuladas**: o fluxo funciona de ponta a ponta (teste grátis, cobrança mensal, cancelamento, aprovação do cadastro), mas nenhum pagamento real acontece e o documento é aprovado no envio.
 
 ## Requisitos não funcionais
 
@@ -84,14 +84,12 @@ flowchart LR
     subgraph SUPA[Supabase]
         AUTH[Auth]
         DB[(PostgreSQL + RLS)]
-        RT[Realtime]
         ST[Storage]
         EF[Edge Functions]
     end
 
     APP --> AUTH
     APP --> DB
-    APP --> RT
     APP --> ST
     APP --> EF
     EF --> PAY[Gateway de pagamento]
@@ -99,10 +97,9 @@ flowchart LR
 
 | Componente                     | Função                                                                                                        |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| App mobile                     | Interface do usuário; consome diretamente os serviços do Supabase (auth, banco, realtime e storage).          |
+| App mobile                     | Interface do usuário; consome diretamente os serviços do Supabase (auth, banco e storage).                    |
 | Supabase Auth                  | Autenticação de pais e professores, incluindo login com Google OAuth.                                         |
 | Supabase Database (PostgreSQL) | Dados estruturados: perfis, solicitações de contato, avaliações e assinaturas. PostGIS para a busca por raio. |
-| Supabase Realtime              | Notificações em tempo real (nova solicitação, aceite, avaliação).                                             |
 | Supabase Storage               | Fotos de perfil (bucket público) e documentos de verificação dos professores (bucket privado).                |
 | RLS, triggers e funções        | Regras de negócio: aceite e recusa, liberação do WhatsApp e da rede social, busca por raio e assinatura.      |
 | Edge Functions                 | Integrações externas (gateway de pagamento, quando houver).                                                   |
@@ -110,20 +107,19 @@ flowchart LR
 
 ### Stack
 
-| Camada                     | Tecnologia                                  |
-| -------------------------- | ------------------------------------------- |
-| Frontend mobile            | React Native com Expo (SDK 57) e TypeScript |
-| Navegação                  | Expo Router                                 |
-| Dados e formulários        | TanStack Query, react-hook-form e zod       |
-| BaaS                       | Supabase                                    |
-| Banco de dados             | PostgreSQL (via Supabase)                   |
-| Autenticação               | Supabase Auth                               |
-| Notificações em tempo real | Supabase Realtime                           |
-| Busca geográfica           | PostGIS                                     |
-| Jobs agendados             | pg_cron                                     |
-| Armazenamento de arquivos  | Supabase Storage                            |
-| Geolocalização             | Google Maps API                             |
-| Infraestrutura             | Gerenciada pelo Supabase                    |
+| Camada                    | Tecnologia                                  |
+| ------------------------- | ------------------------------------------- |
+| Frontend mobile           | React Native com Expo (SDK 57) e TypeScript |
+| Navegação                 | Expo Router                                 |
+| Dados e formulários       | TanStack Query, react-hook-form e zod       |
+| BaaS                      | Supabase                                    |
+| Banco de dados            | PostgreSQL (via Supabase)                   |
+| Autenticação              | Supabase Auth                               |
+| Busca geográfica          | PostGIS                                     |
+| Jobs agendados            | pg_cron                                     |
+| Armazenamento de arquivos | Supabase Storage                            |
+| Geolocalização            | Google Maps API                             |
+| Infraestrutura            | Gerenciada pelo Supabase                    |
 
 ### Padrões de arquitetura
 
@@ -228,8 +224,8 @@ O schema fica em `supabase/migrations/`, uma migração por domínio. Todas as t
 | Verificação         | `teacher_verifications` (CPF e status), `teacher_documents` (arquivos no bucket privado)     |
 | Assinatura          | `subscription_plans`, `subscriptions`, `subscription_payments` (cobranças simuladas)         |
 | Responsáveis        | `students` (filhos), `student_subjects`, `favorite_teachers`                                 |
-| Contato e avaliação | `contact_requests` (`pending` → `accepted`, `declined`, `expired` ou `cancelled`), `reviews` |
-| Notificações        | `notifications` (geradas por triggers, entregues em tempo real)                              |
+| Contato e avaliação | `contact_requests` (`pending` → `accepted`, `declined` ou `expired`), `reviews`              |
+| Notificações        | `notifications` (geradas por triggers e consultadas pelo app)                                |
 
 A busca é a função `search_teachers` (raio com PostGIS, cidade, texto, matéria, idioma, preço, tipo de aula e dias). Dois jobs do pg_cron rodam a cada 15 minutos: um encerra testes grátis e registra as mensalidades simuladas, o outro expira solicitações sem resposta em 24 horas.
 
