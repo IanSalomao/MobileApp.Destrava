@@ -6,10 +6,12 @@ import { Text } from '@/components/ui/text';
 import { useSignOut } from '@/features/auth/hooks';
 import { useSession } from '@/features/auth/session-provider';
 import { ProfileCard } from '@/features/profile/components/profile-card';
+import { useMyProfile } from '@/features/profile/hooks';
 
 export default function AccountScreen() {
   const { session } = useSession();
   const signOut = useSignOut();
+  const { data: profile } = useMyProfile();
 
   if (!session) {
     return (
@@ -31,11 +33,18 @@ export default function AccountScreen() {
   return (
     <Screen>
       <ProfileCard email={session.user.email} />
+      {profile?.role === 'guardian' ? (
+        <Button title="Minhas solicitações" onPress={() => router.push('/my-requests')} />
+      ) : null}
+      {profile?.role === 'teacher' ? (
+        <Button title="Solicitações recebidas" onPress={() => router.push('/received-requests')} />
+      ) : null}
       <Button
         title="Sair"
         variant="secondary"
         loading={signOut.isPending}
-        onPress={() => signOut.mutate()}
+        // Sessão e cache já foram limpos; volta para a tela inicial.
+        onPress={() => signOut.mutate(undefined, { onSuccess: () => router.replace('/') })}
       />
     </Screen>
   );

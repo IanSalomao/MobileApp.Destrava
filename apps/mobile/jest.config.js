@@ -15,6 +15,7 @@ module.exports = {
   // Cobertura: no MVVM a lógica testável mora em api.ts (Model), hooks.ts
   // (ViewModel) e no domínio puro. Coletamos e cobramos só o que já tem teste.
   collectCoverageFrom: [
+    'src/features/auth/route-access.ts',
     'src/features/contact-requests/domain/contact-request.ts',
     'src/features/subjects/api.ts',
     'src/features/subjects/hooks.ts',
@@ -23,6 +24,12 @@ module.exports = {
   // feature nova, adicione o api.ts e o hooks.ts dela em collectCoverageFrom e
   // aqui (ex.: './src/features/contact-requests/api.ts').
   coverageThreshold: {
+    './src/features/auth/route-access.ts': {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
+    },
     './src/features/contact-requests/domain/contact-request.ts': {
       branches: 100,
       functions: 100,
