@@ -2,3 +2,8 @@ export * from './Button';
 export * from './Input';
 export * from './Chip';
 export * from './Banner';
+export * from './Avatar';
+export * from './Rating';
+export * from './TeacherCard';
+export * from './Tabs';
+export * from './DataList';
