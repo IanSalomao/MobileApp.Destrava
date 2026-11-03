@@ -13,12 +13,12 @@ insert into auth.users (id, email, raw_user_meta_data) values
   (
     '33333333-3333-3333-3333-333333333333',
     'teacher1@test.com',
-    '{"role":"teacher","full_name":"Teacher One","phone":"+5511999990003"}'::jsonb
+    '{"role":"teacher","full_name":"Teacher One","phone":"+5511999990003","terms_accepted":"true","terms_version":"test-1"}'::jsonb
   ),
   (
     '44444444-4444-4444-4444-444444444444',
     'teacher2@test.com',
-    '{"role":"teacher","full_name":"Teacher Two","phone":"+5511999990004"}'::jsonb
+    '{"role":"teacher","full_name":"Teacher Two","phone":"+5511999990004","terms_accepted":"true","terms_version":"test-1"}'::jsonb
   );
 
 -- Assinatura e pagamento do teacher1, criados como postgres.

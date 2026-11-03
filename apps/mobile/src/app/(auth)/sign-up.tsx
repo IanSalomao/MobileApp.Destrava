@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { RoleField } from '@/features/auth/components/role-field';
+import { TermsConsentFields } from '@/features/auth/components/terms-consent-fields';
 import { useSignUpForm } from '@/features/auth/hooks';
 import { MIN_PASSWORD_LENGTH, parseRoleParam } from '@/features/auth/schemas';
 
@@ -56,6 +57,8 @@ export default function SignUpScreen() {
         secureTextEntry
         onSubmitEditing={submit}
       />
+
+      <TermsConsentFields control={control} />
 
       {errorMessage ? <Text color="danger">{errorMessage}</Text> : null}
 

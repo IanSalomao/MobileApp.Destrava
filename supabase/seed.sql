@@ -171,7 +171,8 @@ begin
         'role', 'teacher',
         'full_name', v_teacher_names[i],
         'phone', v_phone,
-        'terms_accepted', 'true'
+        'terms_accepted', 'true',
+        'terms_version', '2026-10'
       ),
       now() - (i || ' days')::interval,
       now()
@@ -395,7 +396,9 @@ begin
         'role', 'guardian',
         'full_name', v_guardian_names[g],
         'phone', v_phone,
-        'terms_accepted', 'true'
+        'terms_accepted', 'true',
+        'terms_version', '2026-10',
+        'minor_data_consent', 'true'
       ),
       now() - (g || ' days')::interval,
       now()
