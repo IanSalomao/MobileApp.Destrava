@@ -14,6 +14,8 @@ export const signInSchema = z.object({
   password: z.string().min(1, 'Informe a senha.'),
 });
 
+export const forgotPasswordSchema = z.object({ email });
+
 export const signUpSchema = z
   .object({
     fullName: z
@@ -40,6 +42,7 @@ export const signUpSchema = z
   });
 
 export type SignInInput = z.infer<typeof signInSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 
 // Perfil vindo da rota (/sign-up?role=teacher). Valor ausente ou inválido = sem pré-seleção.

@@ -6,7 +6,15 @@ import type { UserRole } from '@/features/profile/types';
 
 import { defaultAuthRepository, signOut, signUp, type AuthRepository } from './api';
 import { getAuthErrorMessage } from './errors';
-import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from './schemas';
+import { PASSWORD_RESET_CONFIRMATION } from './password-reset';
+import {
+  forgotPasswordSchema,
+  signInSchema,
+  signUpSchema,
+  type ForgotPasswordInput,
+  type SignInInput,
+  type SignUpInput,
+} from './schemas';
 
 // ViewModels das telas de auth: juntam formulário, validação e chamada à API.
 // A tela só renderiza o que vem daqui. Ao logar, o SessionProvider recebe a sessão
@@ -25,6 +33,26 @@ export function useSignInForm(repository: AuthRepository = defaultAuthRepository
     control: form.control,
     submit: form.handleSubmit((values) => mutation.mutate(values)),
     isSubmitting: mutation.isPending,
+    errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
+  };
+}
+
+export function useForgotPasswordForm(repository: AuthRepository = defaultAuthRepository) {
+  const form = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
+  });
+  const mutation = useMutation({
+    mutationFn: (values: ForgotPasswordInput) => repository.requestPasswordReset(values),
+  });
+
+  return {
+    control: form.control,
+    submit: form.handleSubmit((values) => mutation.mutate(values)),
+    isSubmitting: mutation.isPending,
+    // Mesmo texto para qualquer e-mail aceito (sem vazar se a conta existe).
+    confirmationMessage: mutation.isSuccess ? PASSWORD_RESET_CONFIRMATION : null,
+    // Só falhas do envio em si (rede, limite de pedidos); não dependem de a conta existir.
     errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
   };
 }
