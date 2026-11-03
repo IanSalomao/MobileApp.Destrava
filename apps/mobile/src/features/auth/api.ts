@@ -2,10 +2,12 @@ import type { Session } from '@supabase/supabase-js';
 
 import { supabase } from '@/lib/supabase';
 
-import type { SignInInput, SignUpInput } from './schemas';
+import { PASSWORD_RESET_REDIRECT_URL } from './password-reset';
+import type { ForgotPasswordInput, SignInInput, SignUpInput } from './schemas';
 
 export interface AuthRepository {
   signIn(credentials: SignInInput): Promise<unknown>;
+  requestPasswordReset(input: ForgotPasswordInput): Promise<void>;
 }
 
 export async function signIn({ email, password }: SignInInput) {
@@ -14,8 +16,17 @@ export async function signIn({ email, password }: SignInInput) {
   return data;
 }
 
+// O Supabase responde com sucesso mesmo quando o e-mail não existe, então este pedido não revela contas.
+export async function requestPasswordReset({ email }: ForgotPasswordInput) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: PASSWORD_RESET_REDIRECT_URL,
+  });
+  if (error) throw error;
+}
+
 export const defaultAuthRepository: AuthRepository = {
   signIn,
+  requestPasswordReset,
 };
 
 export async function signUp({ fullName, email, password, role }: SignUpInput) {

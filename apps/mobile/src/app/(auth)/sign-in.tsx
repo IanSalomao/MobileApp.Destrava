@@ -50,6 +50,12 @@ export default function SignInScreen({ repository }: SignInScreenProps = {}) {
 
       <Button title="Entrar" loading={isSubmitting} onPress={submit} />
       <Button
+        title="Esqueci minha senha"
+        variant="ghost"
+        disabled={isSubmitting}
+        onPress={() => router.push('/forgot-password')}
+      />
+      <Button
         title="Ainda não tenho conta"
         variant="ghost"
         disabled={isSubmitting}
