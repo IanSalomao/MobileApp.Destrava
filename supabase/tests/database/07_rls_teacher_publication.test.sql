@@ -13,22 +13,22 @@ insert into auth.users (id, email, raw_user_meta_data) values
   (
     '11111111-1111-1111-1111-111111111111',
     'guardian1@test.com',
-    '{"role":"guardian","full_name":"Guardian One","phone":"+5511999990001"}'::jsonb
+    '{"role":"guardian","full_name":"Guardian One","phone":"+5511999990001","terms_accepted":"true","terms_version":"test-1","minor_data_consent":"true"}'::jsonb
   ),
   (
     '33333333-3333-3333-3333-333333333333',
     'teacher1@test.com',
-    '{"role":"teacher","full_name":"Teacher One","phone":"+5511999990003"}'::jsonb
+    '{"role":"teacher","full_name":"Teacher One","phone":"+5511999990003","terms_accepted":"true","terms_version":"test-1"}'::jsonb
   ),
   (
     '44444444-4444-4444-4444-444444444444',
     'teacher2@test.com',
-    '{"role":"teacher","full_name":"Teacher Two","phone":"+5511999990004"}'::jsonb
+    '{"role":"teacher","full_name":"Teacher Two","phone":"+5511999990004","terms_accepted":"true","terms_version":"test-1"}'::jsonb
   ),
   (
     '55555555-5555-5555-5555-555555555555',
     'teacher3@test.com',
-    '{"role":"teacher","full_name":"Teacher Three","phone":"+5511999990005"}'::jsonb
+    '{"role":"teacher","full_name":"Teacher Three","phone":"+5511999990005","terms_accepted":"true","terms_version":"test-1"}'::jsonb
   );
 
 -- teacher1: verificação aprovada + trial -> publicado.

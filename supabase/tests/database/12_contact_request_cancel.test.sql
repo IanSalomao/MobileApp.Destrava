@@ -13,17 +13,17 @@ insert into auth.users (id, email, raw_user_meta_data) values
   (
     '11111111-1111-1111-1111-111111111111',
     'cancel-guardian1@test.com',
-    '{"role":"guardian","full_name":"Guardian One"}'::jsonb
+    '{"role":"guardian","full_name":"Guardian One","terms_accepted":"true","terms_version":"test-1","minor_data_consent":"true"}'::jsonb
   ),
   (
     '22222222-2222-2222-2222-222222222222',
     'cancel-guardian2@test.com',
-    '{"role":"guardian","full_name":"Guardian Two"}'::jsonb
+    '{"role":"guardian","full_name":"Guardian Two","terms_accepted":"true","terms_version":"test-1","minor_data_consent":"true"}'::jsonb
   ),
   (
     '33333333-3333-3333-3333-333333333333',
     'cancel-teacher@test.com',
-    '{"role":"teacher","full_name":"Teacher One"}'::jsonb
+    '{"role":"teacher","full_name":"Teacher One","terms_accepted":"true","terms_version":"test-1"}'::jsonb
   );
 
 update public.teacher_verifications

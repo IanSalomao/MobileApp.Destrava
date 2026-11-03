@@ -60,7 +60,14 @@ export function useForgotPasswordForm(repository: AuthRepository = defaultAuthRe
 export function useSignUpForm(initialRole?: UserRole) {
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { fullName: '', email: '', password: '', role: initialRole },
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+      role: initialRole,
+      termsAccepted: false,
+      minorDataConsent: false,
+    },
   });
   const mutation = useMutation({ mutationFn: signUp });
 

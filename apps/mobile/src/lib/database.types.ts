@@ -239,8 +239,10 @@ export type Database = {
           created_at: string;
           full_name: string;
           id: string;
+          minor_data_consent_at: string | null;
           role: Database['public']['Enums']['user_role'] | null;
           terms_accepted_at: string | null;
+          terms_version: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -249,8 +251,10 @@ export type Database = {
           created_at?: string;
           full_name?: string;
           id: string;
+          minor_data_consent_at?: string | null;
           role?: Database['public']['Enums']['user_role'] | null;
           terms_accepted_at?: string | null;
+          terms_version?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -258,8 +262,10 @@ export type Database = {
           created_at?: string;
           full_name?: string;
           id?: string;
+          minor_data_consent_at?: string | null;
           role?: Database['public']['Enums']['user_role'] | null;
           terms_accepted_at?: string | null;
+          terms_version?: string | null;
           updated_at?: string;
         };
         Relationships: [];

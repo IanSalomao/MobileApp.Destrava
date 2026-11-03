@@ -2,9 +2,9 @@ import type { Session } from '@supabase/supabase-js';
 
 import { supabase } from '@/lib/supabase';
 
+import { buildSignUpMetadata } from './consent';
 import { PASSWORD_RESET_REDIRECT_URL } from './password-reset';
 import type { ForgotPasswordInput, SignInInput, SignUpInput } from './schemas';
-
 export interface AuthRepository {
   signIn(credentials: SignInInput): Promise<unknown>;
   requestPasswordReset(input: ForgotPasswordInput): Promise<void>;
@@ -30,10 +30,11 @@ export const defaultAuthRepository: AuthRepository = {
 };
 
 export async function signUp({ fullName, email, password, role }: SignUpInput) {
+  // termsAccepted e minorDataConsent já foram exigidos pelo schema; o aceite segue nos metadados.
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName, role } },
+    options: { data: buildSignUpMetadata({ fullName, role }) },
   });
   if (error) throw error;
   return data;
