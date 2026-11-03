@@ -1,8 +1,9 @@
 import type { AuthRepository } from '../api';
-import type { SignInInput } from '../schemas';
+import type { ForgotPasswordInput, SignInInput } from '../schemas';
 
 export class FakeAuthRepository implements AuthRepository {
   public calls: SignInInput[] = [];
+  public passwordResetRequests: ForgotPasswordInput[] = [];
   public shouldFailWithNetworkError = false;
   public delayMs = 0;
 
@@ -42,5 +43,18 @@ export class FakeAuthRepository implements AuthRepository {
         access_token: 'fake-access-token',
       },
     };
+  }
+
+  // Como o Supabase: o pedido é aceito para qualquer e-mail, cadastrado ou não.
+  async requestPasswordReset(input: ForgotPasswordInput) {
+    this.passwordResetRequests.push(input);
+
+    if (this.delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, this.delayMs));
+    }
+
+    if (this.shouldFailWithNetworkError) {
+      throw new Error('Network error');
+    }
   }
 }
