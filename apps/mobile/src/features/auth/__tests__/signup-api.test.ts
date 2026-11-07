@@ -13,10 +13,11 @@ describe('AUT-09: signUp envia o aceite ao Supabase', () => {
   );
   afterEach(() => jest.clearAllMocks());
 
-  it('inclui versão do termo e aceite nos metadados do cadastro', async () => {
+  it('inclui versão do termo, aceite e celular nos metadados do cadastro', async () => {
     await signUp({
       fullName: 'Ana',
       email: 'ana@destrava.com',
+      phone: '11999991234',
       password: 'senha-segura-1',
       role: 'teacher',
       termsAccepted: true,
@@ -32,6 +33,7 @@ describe('AUT-09: signUp envia o aceite ao Supabase', () => {
           role: 'teacher',
           terms_accepted: true,
           terms_version: TERMS_VERSION,
+          phone: '+5511999991234',
         },
       },
     });

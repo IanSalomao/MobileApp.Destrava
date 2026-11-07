@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { USER_ROLES, type UserRole } from '@/features/profile/types';
+import { isValidBRPhone } from '@/lib/phone';
 
 import { MINOR_DATA_REQUIRED_MESSAGE, TERMS_REQUIRED_MESSAGE } from './consent';
 
@@ -24,6 +25,7 @@ export const signUpSchema = z
       .min(2, 'Informe seu nome.')
       .max(120, 'Use no máximo 120 caracteres.'),
     email,
+    phone: z.string().trim().refine(isValidBRPhone, 'Informe um celular válido com DDD.'),
     password: z
       .string()
       .min(

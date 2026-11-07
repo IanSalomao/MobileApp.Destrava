@@ -1,7 +1,7 @@
 -- Catálogo: extensões, tipos compartilhados e listas de referência (matérias e idiomas).
 
--- PostGIS para a busca por proximidade (RF04) e unaccent para a busca por texto sem acento.
-create extension if not exists postgis with schema extensions;
+-- unaccent para a busca por texto sem acento. A busca filtra por cidade e estado (RF04), sem
+-- geolocalização (decisão do grupo): não usamos PostGIS.
 create extension if not exists unaccent with schema extensions;
 
 -- Tipo de reforço (RF05). No protótipo aparece como "Tipo de aula": online ou presencial.

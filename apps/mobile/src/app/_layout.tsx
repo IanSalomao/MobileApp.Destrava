@@ -65,6 +65,11 @@ function RootNavigator() {
       <Stack.Protected guard={canAccess('guest', access)}>
         <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
       </Stack.Protected>
+      {/* Onboarding pós-cadastro (etapa 2 do responsável; assinatura e perfil do professor): exige
+          apenas estar logado. As telas são alcançadas por router.replace logo após o cadastro. */}
+      <Stack.Protected guard={access.isSignedIn}>
+        <Stack.Screen name="(onboarding)" />
+      </Stack.Protected>
       {/* Áreas por papel (AUT-05): quem não tem o papel é redirecionado para as abas. */}
       <Stack.Protected guard={canAccess('guardian', access)}>
         <Stack.Screen name="(guardian)" />

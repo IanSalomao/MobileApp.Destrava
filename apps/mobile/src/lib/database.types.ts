@@ -733,7 +733,6 @@ export type Database = {
           hourly_rate_cents: number | null;
           id: string;
           is_published: boolean;
-          location: unknown;
           neighborhood: string | null;
           postal_code: string | null;
           rating_average: number | null;
@@ -753,7 +752,6 @@ export type Database = {
           hourly_rate_cents?: number | null;
           id: string;
           is_published?: boolean;
-          location?: unknown;
           neighborhood?: string | null;
           postal_code?: string | null;
           rating_average?: number | null;
@@ -772,7 +770,6 @@ export type Database = {
           hourly_rate_cents?: number | null;
           id?: string;
           is_published?: boolean;
-          location?: unknown;
           neighborhood?: string | null;
           postal_code?: string | null;
           rating_average?: number | null;
@@ -860,14 +857,11 @@ export type Database = {
         Args: {
           p_city?: string;
           p_language_ids?: string[];
-          p_latitude?: number;
           p_limit?: number;
-          p_longitude?: number;
           p_max_hourly_rate_cents?: number;
           p_min_hourly_rate_cents?: number;
           p_offset?: number;
           p_query?: string;
-          p_radius_km?: number;
           p_state?: string;
           p_subject_ids?: string[];
           p_tutoring_types?: Database['public']['Enums']['tutoring_type'][];
@@ -876,7 +870,6 @@ export type Database = {
         Returns: {
           avatar_url: string;
           city: string;
-          distance_km: number;
           education_levels: Database['public']['Enums']['education_level'][];
           full_name: string;
           hourly_rate_cents: number;

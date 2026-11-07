@@ -65,7 +65,6 @@ create table public.teachers (
   neighborhood text check (char_length(neighborhood) <= 80),
   city text check (char_length(city) <= 80),
   state text check (state ~ '^[A-Z]{2}$'),
-  location extensions.geography(point, 4326),
   is_published boolean not null default false,
   rating_average numeric(3, 2),
   rating_count integer not null default 0,
@@ -77,38 +76,17 @@ comment on table public.teachers is 'Perfil profissional do professor. Público 
 comment on column public.teachers.tutoring_types is 'Tipo de reforço: online, presencial ou os dois.';
 comment on column public.teachers.available_weekdays is
   'Dias disponíveis: 0 = domingo ... 6 = sábado (mesma numeração do Date.getDay()).';
-comment on column public.teachers.location is
-  'Ponto aproximado da região de atendimento. O banco arredonda para uma grade de ~500 m.';
 comment on column public.teachers.is_published is
   'Visível para as famílias: verificação aprovada e assinatura em teste ou ativa. Mantido pelo banco.';
 comment on column public.teachers.rating_average is
   'Nota média (RF06), mantida pelo trigger de reviews. Nula enquanto não houver avaliações.';
 
--- Índice da busca por proximidade (RNF01). Parcial: a busca só olha professores publicados.
-create index teachers_location_idx on public.teachers using gist (location) where is_published;
+-- Índice da busca por cidade/estado (RNF01). Parcial: a busca só olha professores publicados.
+create index teachers_city_state_idx on public.teachers (state, city) where is_published;
 
 create trigger teachers_set_updated_at
   before update on public.teachers
   for each row execute function public.set_updated_at();
-
--- LGPD: não guardamos o endereço exato do professor. O ponto é arredondado para uma grade de
--- 0,005° (~500 m); a distância exibida ("2,4 km") continua útil.
-create function public.snap_teacher_location()
-returns trigger
-language plpgsql
-set search_path = ''
-as $$
-begin
-  if new.location is not null then
-    new.location := extensions.st_snaptogrid(new.location::extensions.geometry, 0.005)::extensions.geography;
-  end if;
-  return new;
-end;
-$$;
-
-create trigger teachers_snap_location
-  before insert or update of location on public.teachers
-  for each row execute function public.snap_teacher_location();
 
 create table public.teacher_subjects (
   teacher_id uuid not null default auth.uid() references public.teachers (id) on delete cascade,
@@ -243,8 +221,7 @@ grant update (
   postal_code,
   neighborhood,
   city,
-  state,
-  location
+  state
 ) on public.teachers to authenticated;
 
 -- Auxiliar de RLS (veja private.is_guardian na migração de contas).
@@ -465,7 +442,7 @@ begin
   ) then
     missing := missing || 'identity_document'::text;
   end if;
-  if teacher.city is null or teacher.state is null or teacher.location is null then
+  if teacher.city is null or teacher.state is null then
     missing := missing || 'location'::text;
   end if;
   if not exists (select 1 from public.teacher_subjects where teacher_id = current_user_id) then

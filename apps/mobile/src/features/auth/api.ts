@@ -29,12 +29,13 @@ export const defaultAuthRepository: AuthRepository = {
   requestPasswordReset,
 };
 
-export async function signUp({ fullName, email, password, role }: SignUpInput) {
-  // termsAccepted e minorDataConsent já foram exigidos pelo schema; o aceite segue nos metadados.
+export async function signUp({ fullName, email, phone, password, role }: SignUpInput) {
+  // termsAccepted e minorDataConsent já foram exigidos pelo schema; o aceite e o celular seguem nos
+  // metadados, que o trigger handle_new_user lê para criar profiles e contact_details.
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: buildSignUpMetadata({ fullName, role }) },
+    options: { data: buildSignUpMetadata({ fullName, role, phone }) },
   });
   if (error) throw error;
   return data;

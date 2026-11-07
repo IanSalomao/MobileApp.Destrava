@@ -9,6 +9,7 @@ import { signUpSchema } from '../schemas';
 const baseInput = {
   fullName: 'Maria Souza',
   email: 'maria@destrava.com',
+  phone: '11999991234',
   password: 'senha-segura-1',
   termsAccepted: true,
   minorDataConsent: false,
@@ -48,22 +49,34 @@ describe('AUT-09: aceite de Termos e Política no cadastro', () => {
 });
 
 describe('AUT-09: buildSignUpMetadata (o que o banco grava como prova)', () => {
-  it('professor: envia aceite e versão, sem consentimento de menor', () => {
-    expect(buildSignUpMetadata({ fullName: 'Ana', role: 'teacher' })).toEqual({
-      full_name: 'Ana',
-      role: 'teacher',
-      terms_accepted: true,
-      terms_version: TERMS_VERSION,
-    });
+  it('professor: envia aceite, versão e celular em E.164, sem consentimento de menor', () => {
+    expect(buildSignUpMetadata({ fullName: 'Ana', role: 'teacher', phone: '11999991234' })).toEqual(
+      {
+        full_name: 'Ana',
+        role: 'teacher',
+        terms_accepted: true,
+        terms_version: TERMS_VERSION,
+        phone: '+5511999991234',
+      },
+    );
   });
 
   it('responsável: envia também o consentimento sobre dados do menor', () => {
-    expect(buildSignUpMetadata({ fullName: 'Bia', role: 'guardian' })).toEqual({
+    expect(
+      buildSignUpMetadata({ fullName: 'Bia', role: 'guardian', phone: '11999991234' }),
+    ).toEqual({
       full_name: 'Bia',
       role: 'guardian',
       terms_accepted: true,
       terms_version: TERMS_VERSION,
+      phone: '+5511999991234',
       minor_data_consent: true,
     });
+  });
+
+  it('celular inválido não entra nos metadados (o banco o deixaria nulo)', () => {
+    expect(
+      buildSignUpMetadata({ fullName: 'Caio', role: 'teacher', phone: '123' }),
+    ).not.toHaveProperty('phone');
   });
 });

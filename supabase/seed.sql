@@ -85,17 +85,6 @@ declare
     '22250040', '20511000',
     '30140071', '44001432', '41810012', '80420090'
   ];
-  v_lats double precision[] := array[
-    -23.5614, -23.5891, -23.6009, -23.5367,
-    -22.9519, -22.9248,
-    -19.9386, -12.2564, -13.0012, -25.4411
-  ];
-  v_lngs double precision[] := array[
-    -46.6959, -46.6347, -46.6656, -46.6743,
-    -43.1857, -43.2325,
-    -43.9352, -38.9593, -38.4589, -49.2862
-  ];
-
   v_subjects text[] := array[
     'math', 'portuguese', 'physics', 'chemistry', 'biology',
     'history', 'english', 'geography', 'writing', 'literacy'
@@ -213,14 +202,7 @@ begin
       postal_code = v_postals[v_loc_idx],
       neighborhood = v_neighborhoods[v_loc_idx],
       city = v_cities[v_loc_idx],
-      state = v_states[v_loc_idx],
-      location = extensions.st_setsrid(
-        extensions.st_makepoint(
-          v_lngs[v_loc_idx] + ((i % 7) - 3) * 0.006,
-          v_lats[v_loc_idx] + ((i % 5) - 2) * 0.006
-        ),
-        4326
-      )::extensions.geography
+      state = v_states[v_loc_idx]
     where id = v_teacher_id;
 
     -- Matérias (2 matérias por professor)

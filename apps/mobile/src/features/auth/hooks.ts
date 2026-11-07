@@ -57,19 +57,30 @@ export function useForgotPasswordForm(repository: AuthRepository = defaultAuthRe
   };
 }
 
-export function useSignUpForm(initialRole?: UserRole) {
+export function useSignUpForm(
+  initialRole?: UserRole,
+  // Chamado quando o cadastro criou a sessão (confirmação de e-mail desligada): a tela leva o
+  // usuário ao onboarding do papel antes que a guarda de rotas o tire do fluxo de auth.
+  onSignedIn?: (role: UserRole) => void,
+) {
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       fullName: '',
       email: '',
+      phone: '',
       password: '',
       role: initialRole,
       termsAccepted: false,
       minorDataConsent: false,
     },
   });
-  const mutation = useMutation({ mutationFn: signUp });
+  const mutation = useMutation({
+    mutationFn: signUp,
+    onSuccess: (data, variables) => {
+      if (data.session) onSignedIn?.(variables.role);
+    },
+  });
 
   return {
     control: form.control,

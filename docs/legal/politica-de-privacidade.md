@@ -10,7 +10,7 @@ O Destrava aproxima responsáveis que procuram reforço escolar e professores pa
 
 - **Conta (todos):** nome, e-mail, senha (protegida pelo provedor de autenticação; não a vemos em texto), papel (responsável ou professor), celular usado no WhatsApp, e a versão, data e hora do seu aceite destes documentos.
 - **Responsável:** dados básicos do aluno (nome, ano escolar, idade se informada, objetivo e preferência por aula online ou presencial) e, em cada pedido de contato, o motivo do reforço. Também guardamos avaliações, professores favoritos e notificações.
-- **Professor:** foto, apresentação, valor da hora, matérias, idiomas, tipos de aula, disponibilidade, CEP, bairro, cidade e estado, links de redes sociais e o documento de identidade enviado para verificação.
+- **Professor:** foto, apresentação, valor da hora, matérias, idiomas, tipos de aula, disponibilidade, cidade e estado, links de redes sociais e o documento de identidade enviado para verificação.
 - **Assinatura (professor):** plano, datas e estado. A assinatura é simulada nesta fase (item 7).
 - **No aparelho:** a sessão de login, guardada em armazenamento seguro do sistema. Não usamos publicidade nem ferramentas de análise de terceiros.
 
@@ -27,9 +27,9 @@ Não coletamos dados diretamente de menores. Só o **responsável legal**, maior
 
 O professor que recebe um pedido vê o que o responsável preencheu no formulário (nome do aluno, ano escolar, idade se informada e motivo), para decidir se aceita. Os dados salvos no perfil do aluno não são visíveis a professores.
 
-## 4. Localização aproximada
+## 4. Localização
 
-O professor informa CEP, bairro e cidade. A partir disso guardamos um ponto **aproximado**, arredondado em uma grade de cerca de 500 metros, usado só para a busca por proximidade. A busca do responsável usa a região que ele informar. Hoje o app não acessa a localização do seu aparelho; se isso mudar, pediremos sua permissão antes.
+O professor informa a **cidade e o estado** em que atua, usados para que responsáveis encontrem professores na mesma região. Não guardamos endereço exato nem coordenadas geográficas, e o app não acessa a localização do seu aparelho.
 
 ## 5. Documento de identidade (professores)
 

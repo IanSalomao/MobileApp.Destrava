@@ -18,7 +18,7 @@ O Destrava é um aplicativo que aproxima pais que procuram reforço escolar para
 O Destrava junta os dois lados numa plataforma só, com foco em **confiança e controle**:
 
 - **Professores com identidade verificada**, por envio de documento no cadastro.
-- **Busca por proximidade**, com filtros por matéria, idioma, valor e tipo de reforço.
+- **Busca por cidade e estado**, com filtros por matéria, idioma, valor e tipo de reforço.
 - **Avaliações por estrelas**, com comentário opcional, deixadas por pais que já tiveram aula com o professor.
 - **Contato mediado:** o pai envia uma solicitação e o professor decide se aceita ou recusa. Só depois do aceite os dois passam a ver o WhatsApp um do outro e o link da rede social do professor aparece. Isso dá mais privacidade e segurança aos dois lados. A conversa acontece no WhatsApp; não há chat dentro do app.
 
@@ -29,33 +29,34 @@ O Destrava junta os dois lados numa plataforma só, com foco em **confiança e c
 
 ## Como funciona
 
-1. Qualquer pessoa, mesmo sem cadastro, navega pelos perfis dos professores próximos e vê nome, matérias, valor da hora e avaliações.
-2. O pai cria uma conta e envia uma **solicitação de contato** por formulário, com seus dados, os dados do filho e o motivo do reforço.
-3. O professor recebe a solicitação e **aceita ou recusa** em até 24 horas. Sem resposta, a solicitação expira e o pai pode pedir de novo.
-4. Com o aceite, cada um ganha um **botão para abrir o WhatsApp** do outro e o **link da rede social** do professor passa a ficar visível para aquele pai.
-5. Depois da aula, o pai **avalia** o professor com uma nota (obrigatória) e um comentário (opcional).
+1. Pai ou professor **cria uma conta e faz login** — a primeira tela do app é o login; não há navegação sem cadastro.
+2. O pai **busca professores na sua cidade e estado** e vê nome, matérias, valor da hora e avaliações.
+3. O pai envia uma **solicitação de contato** por formulário, com seus dados, os dados do filho e o motivo do reforço.
+4. O professor recebe a solicitação e **aceita ou recusa** em até 24 horas. Sem resposta, a solicitação expira e o pai pode pedir de novo.
+5. Com o aceite, cada um ganha um **botão para abrir o WhatsApp** do outro e o **link da rede social** do professor passa a ficar visível para aquele pai.
+6. Depois da aula, o pai **avalia** o professor com uma nota (obrigatória) e um comentário (opcional).
 
 ## Requisitos funcionais
 
-| Código | O sistema deve                                                                                                                                                           |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| RF01   | Permitir que professores criem uma conta e um perfil completo: dados pessoais, formação (opcional), matérias, idiomas, disponibilidade, tipo de reforço e valor da hora. |
-| RF02   | Permitir a verificação de identidade do professor por envio de documento no cadastro.                                                                                    |
-| RF03   | Permitir que qualquer usuário, mesmo sem cadastro, navegue e veja o perfil dos professores próximos (nome, matérias, valor e avaliações), exceto o link de rede social.  |
-| RF04   | Permitir a busca de professores por proximidade geográfica (raio de distância ou cidade).                                                                                |
-| RF05   | Permitir filtrar professores por matéria, idioma, valor e tipo de reforço.                                                                                               |
-| RF06   | Exibir no perfil do professor a nota média e a quantidade total de avaliações recebidas.                                                                                 |
-| RF07   | Permitir que o pai solicite contato com um professor por formulário (dados do responsável, do filho e motivo do reforço).                                                |
-| RF08   | Permitir que o professor aceite ou recuse uma solicitação de contato recebida.                                                                                           |
-| RF09   | Liberar o número de WhatsApp de cada lado para o outro somente após o professor aceitar a solicitação; antes do aceite nenhum dos dois vê o número.                      |
-| RF10   | Exibir, após o aceite, um botão "Conversar no WhatsApp" que abre a conversa por link `wa.me` com mensagem inicial pré-preenchida; o app não tem chat próprio.            |
-| RF11   | Liberar o link de rede social do professor somente após o aceite da solicitação.                                                                                         |
-| RF12   | Permitir que o pai avalie o professor com nota (obrigatória) e comentário (opcional) após a aula.                                                                        |
-| RF13   | Processar a cobrança da assinatura do professor, incluindo o controle do período de teste gratuito.                                                                      |
-| RF14   | Exibir para o pai a lista "Minhas solicitações", com o status de cada uma (pendente, aceita, recusada ou expirada) e o botão do WhatsApp nas aceitas.                    |
-| RF15   | Exibir para o professor a lista "Solicitações recebidas", com aceitar e recusar nas pendentes e o botão do WhatsApp nas aceitas.                                         |
+| Código | O sistema deve                                                                                                                                                                                                                      |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RF01   | Permitir que professores criem uma conta e um perfil completo: dados pessoais, formação (opcional), matérias, idiomas, disponibilidade, tipo de reforço e valor da hora.                                                            |
+| RF02   | Permitir a verificação de identidade do professor por envio de documento no cadastro.                                                                                                                                               |
+| RF03   | Exigir cadastro e login para usar o app (pai ou professor); a primeira tela é o login, sem navegação anônima. O usuário autenticado vê o perfil dos professores (nome, matérias, valor e avaliações), exceto o link de rede social. |
+| RF04   | Permitir a busca de professores por localização, filtrando por cidade e estado (sem cálculo de raio geográfico).                                                                                                                    |
+| RF05   | Permitir filtrar professores por matéria, idioma, valor e tipo de reforço.                                                                                                                                                          |
+| RF06   | Exibir no perfil do professor a nota média e a quantidade total de avaliações recebidas.                                                                                                                                            |
+| RF07   | Permitir que o pai solicite contato com um professor por formulário (dados do responsável, do filho e motivo do reforço).                                                                                                           |
+| RF08   | Permitir que o professor aceite ou recuse uma solicitação de contato recebida.                                                                                                                                                      |
+| RF09   | Liberar o número de WhatsApp de cada lado para o outro somente após o professor aceitar a solicitação; antes do aceite nenhum dos dois vê o número.                                                                                 |
+| RF10   | Exibir, após o aceite, um botão "Conversar no WhatsApp" que abre a conversa por link `wa.me` com mensagem inicial pré-preenchida; o app não tem chat próprio.                                                                       |
+| RF11   | Liberar o link de rede social do professor somente após o aceite da solicitação.                                                                                                                                                    |
+| RF12   | Permitir que o pai avalie o professor com nota (obrigatória) e comentário (opcional) após a aula.                                                                                                                                   |
+| RF13   | Processar a cobrança da assinatura do professor, incluindo o controle do período de teste gratuito.                                                                                                                                 |
+| RF14   | Exibir para o pai a lista "Minhas solicitações", com o status de cada uma (pendente, aceita, recusada ou expirada) e o botão do WhatsApp nas aceitas.                                                                               |
+| RF15   | Exibir para o professor a lista "Solicitações recebidas", com aceitar e recusar nas pendentes e o botão do WhatsApp nas aceitas.                                                                                                    |
 
-> **Mudanças em relação à apresentação:** o chat interno previsto originalmente (RF09, RF10, RF14 e RF15) foi substituído por um botão que abre o WhatsApp, liberado só depois do aceite. A mudança reduz o escopo do MVP (sem mensageria própria, moderação de conteúdo ou armazenamento de conversas) e mantém o número de telefone protegido até o professor aceitar, o que dá mais privacidade a famílias e professores. Por isso o Supabase Realtime também saiu da arquitetura. No MVP, a cobrança da assinatura (RF13) e a verificação de identidade (RF02) são **simuladas**: o fluxo funciona de ponta a ponta (teste grátis, cobrança mensal, cancelamento, aprovação do cadastro), mas nenhum pagamento real acontece e o documento é aprovado no envio.
+> **Mudanças em relação à apresentação:** o chat interno previsto originalmente (RF09, RF10, RF14 e RF15) foi substituído por um botão que abre o WhatsApp, liberado só depois do aceite. A mudança reduz o escopo do MVP (sem mensageria própria, moderação de conteúdo ou armazenamento de conversas) e mantém o número de telefone protegido até o professor aceitar, o que dá mais privacidade a famílias e professores. Por isso o Supabase Realtime também saiu da arquitetura. No MVP, a cobrança da assinatura (RF13) e a verificação de identidade (RF02) são **simuladas**: o fluxo funciona de ponta a ponta (teste grátis, cobrança mensal, cancelamento, aprovação do cadastro), mas nenhum pagamento real acontece e o documento é aprovado no envio. Também passaram a valer duas decisões posteriores da equipe: o **cadastro é obrigatório** — a primeira tela é o login e não há navegação anônima (RF03) — e a **busca por proximidade passou a ser por cidade e estado**, não por raio geográfico (RF04), o que removeu PostGIS, o Google Maps e a permissão de localização da arquitetura.
 
 ## Requisitos não funcionais
 
@@ -74,12 +75,11 @@ O Destrava junta os dois lados numa plataforma só, com foco em **confiança e c
 
 ## Arquitetura
 
-O app mobile consome diretamente os serviços do Supabase, sem um backend próprio. As regras de negócio que não podem depender do app (aceite e recusa, liberação do WhatsApp e da rede social, cálculo de raio, controle de assinatura) ficam no próprio banco, em políticas de RLS (Row Level Security), triggers e funções. Edge Functions ficam para as integrações externas, como o gateway de pagamento quando ele for escolhido.
+O app mobile consome diretamente os serviços do Supabase, sem um backend próprio. As regras de negócio que não podem depender do app (aceite e recusa, liberação do WhatsApp e da rede social, controle de assinatura) ficam no próprio banco, em políticas de RLS (Row Level Security), triggers e funções. Edge Functions ficam para as integrações externas, como o gateway de pagamento quando ele for escolhido.
 
 ```mermaid
 flowchart LR
     U([Usuário]) --> APP[App mobile<br/>React Native + Expo]
-    APP --> MAPS[Google Maps API]
 
     subgraph SUPA[Supabase]
         AUTH[Auth]
@@ -95,15 +95,15 @@ flowchart LR
     EF --> PAY[Gateway de pagamento]
 ```
 
-| Componente                     | Função                                                                                                        |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| App mobile                     | Interface do usuário; consome diretamente os serviços do Supabase (auth, banco e storage).                    |
-| Supabase Auth                  | Autenticação de pais e professores, incluindo login com Google OAuth.                                         |
-| Supabase Database (PostgreSQL) | Dados estruturados: perfis, solicitações de contato, avaliações e assinaturas. PostGIS para a busca por raio. |
-| Supabase Storage               | Fotos de perfil (bucket público) e documentos de verificação dos professores (bucket privado).                |
-| RLS, triggers e funções        | Regras de negócio: aceite e recusa, liberação do WhatsApp e da rede social, busca por raio e assinatura.      |
-| Edge Functions                 | Integrações externas (gateway de pagamento, quando houver).                                                   |
-| APIs externas                  | Mapas (geolocalização), WhatsApp (abertura da conversa por link) e gateway de pagamento.                      |
+| Componente                     | Função                                                                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| App mobile                     | Interface do usuário; consome diretamente os serviços do Supabase (auth, banco e storage).                                            |
+| Supabase Auth                  | Autenticação de pais e professores, incluindo login com Google OAuth.                                                                 |
+| Supabase Database (PostgreSQL) | Dados estruturados: perfis, solicitações de contato, avaliações e assinaturas. A busca filtra por cidade e estado (campos do perfil). |
+| Supabase Storage               | Fotos de perfil (bucket público) e documentos de verificação dos professores (bucket privado).                                        |
+| RLS, triggers e funções        | Regras de negócio: aceite e recusa, liberação do WhatsApp e da rede social, busca por cidade/estado e assinatura.                     |
+| Edge Functions                 | Integrações externas (gateway de pagamento, quando houver).                                                                           |
+| APIs externas                  | WhatsApp (abertura da conversa por link) e gateway de pagamento.                                                                      |
 
 ### Stack
 
@@ -115,10 +115,8 @@ flowchart LR
 | BaaS                      | Supabase                                    |
 | Banco de dados            | PostgreSQL (via Supabase)                   |
 | Autenticação              | Supabase Auth                               |
-| Busca geográfica          | PostGIS                                     |
 | Jobs agendados            | pg_cron                                     |
 | Armazenamento de arquivos | Supabase Storage                            |
-| Geolocalização            | Google Maps API                             |
 | Infraestrutura            | Gerenciada pelo Supabase                    |
 
 ### Padrões de arquitetura
@@ -129,7 +127,7 @@ flowchart LR
 | Domínio (dentro do app) | Clean Architecture                                      |
 | BaaS / Edge Functions   | Organização por domínio de negócio                      |
 
-Como o app fala direto com o Supabase, a Clean Architecture é aplicada dentro do próprio app: as regras de negócio (liberar WhatsApp e rede social só após o aceite, calcular a proximidade) ficam isoladas das chamadas ao SDK do Supabase. Se o grupo trocar de provedor de BaaS no futuro, só a camada de integração precisa ser reescrita.
+Como o app fala direto com o Supabase, a Clean Architecture é aplicada dentro do próprio app: as regras de negócio (liberar WhatsApp e rede social só após o aceite) ficam isoladas das chamadas ao SDK do Supabase. Se o grupo trocar de provedor de BaaS no futuro, só a camada de integração precisa ser reescrita.
 
 No MVP essa separação é aplicada de forma simplificada: cada feature concentra as chamadas ao Supabase num arquivo `api.ts`, os hooks da feature fazem o papel de ViewModel e as telas só renderizam.
 
@@ -147,8 +145,8 @@ O Destrava roda em nuvem, sobre o Supabase:
 
 - **Receita:** assinatura mensal cobrada dos professores, com valor acessível e período de teste gratuito. Como evolução, está previsto um modelo freemium, com recursos pagos como maior destaque nos resultados de busca.
 - **Canais:** Instagram, landing page otimizada para SEO, Play Store e App Store, parcerias com escolas e indicação boca a boca entre pais, alunos e professores.
-- **Parcerias principais:** escolas (divulgação), gateway de pagamento, serviço de verificação de documentos, provedor de mapas e Supabase.
-- **Custos:** desenvolvimento e manutenção do app, infraestrutura (Supabase), APIs de terceiros (mapas, verificação de identidade e pagamentos), marketing e aquisição de usuários, suporte, moderação e conformidade com a LGPD.
+- **Parcerias principais:** escolas (divulgação), gateway de pagamento, serviço de verificação de documentos e Supabase.
+- **Custos:** desenvolvimento e manutenção do app, infraestrutura (Supabase), APIs de terceiros (verificação de identidade e pagamentos), marketing e aquisição de usuários, suporte, moderação e conformidade com a LGPD.
 
 ## Desenvolvimento
 
@@ -214,7 +212,7 @@ O Supabase Studio local (painel do banco) fica em http://127.0.0.1:54323 enquant
 
 ### Banco de dados
 
-O schema fica em `supabase/migrations/`, uma migração por domínio. Todas as tabelas têm RLS; as regras de acesso (o que o visitante vê, o que o aceite libera) valem no banco, não só na interface.
+O schema fica em `supabase/migrations/`, uma migração por domínio. Todas as tabelas têm RLS; as regras de acesso (o que cada usuário autenticado vê, o que o aceite libera) valem no banco, não só na interface.
 
 | Domínio             | Tabelas                                                                                      |
 | ------------------- | -------------------------------------------------------------------------------------------- |
@@ -227,7 +225,7 @@ O schema fica em `supabase/migrations/`, uma migração por domínio. Todas as t
 | Contato e avaliação | `contact_requests` (`pending` → `accepted`, `declined` ou `expired`), `reviews`              |
 | Notificações        | `notifications` (geradas por triggers e consultadas pelo app)                                |
 
-A busca é a função `search_teachers` (raio com PostGIS, cidade, texto, matéria, idioma, preço, tipo de aula e dias). Dois jobs do pg_cron rodam a cada 15 minutos: um encerra testes grátis e registra as mensalidades simuladas, o outro expira solicitações sem resposta em 24 horas.
+A busca é a função `search_teachers` (cidade e estado, texto, matéria, idioma, preço, tipo de aula e dias). Dois jobs do pg_cron rodam a cada 15 minutos: um encerra testes grátis e registra as mensalidades simuladas, o outro expira solicitações sem resposta em 24 horas.
 
 ### Mudando o banco
 

@@ -21,11 +21,7 @@ export default function AccountScreen() {
           Com uma conta você pede contato com professores, conversa pelo chat e deixa avaliações.
         </Text>
         <Button title="Entrar" onPress={() => router.push('/sign-in')} />
-        <Button
-          title="Criar conta"
-          variant="secondary"
-          onPress={() => router.push('/(auth)/sign-up')}
-        />
+        <Button title="Criar conta" variant="secondary" onPress={() => router.push('/welcome')} />
       </Screen>
     );
   }

@@ -124,7 +124,7 @@ describe('AUT-04: acesso a partir do login', () => {
   it('"Esqueci minha senha" na tela de login abre a recuperação', () => {
     renderWithQueryClient(<SignInScreen repository={new FakeAuthRepository()} />);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Esqueci minha senha' }));
+    fireEvent.press(screen.getByText('Esqueci minha senha'));
 
     expect(router.push).toHaveBeenCalledWith('/forgot-password');
   });

@@ -4,10 +4,11 @@ import { router } from 'expo-router';
 import { WelcomeScreen } from './welcome-screen';
 
 // AUT-01: a tela só dispara navegação. Mockamos o router para verificar a rota
-// de destino de cada botão, sem montar a árvore de navegação real.
-jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
+// de destino de cada ação, sem montar a árvore de navegação real.
+jest.mock('expo-router', () => ({ router: { push: jest.fn(), replace: jest.fn() } }));
 
 const mockPush = router.push as jest.Mock;
+const mockReplace = router.replace as jest.Mock;
 
 describe('AUT-01: WelcomeScreen (escolha de perfil)', () => {
   afterEach(() => jest.clearAllMocks());
@@ -15,7 +16,7 @@ describe('AUT-01: WelcomeScreen (escolha de perfil)', () => {
   it('mostra o título e a pergunta da tela', () => {
     render(<WelcomeScreen />);
 
-    expect(screen.getByText('Bem-vindo ao Destrava')).toBeTruthy();
+    expect(screen.getByText('BEM-VINDO AO DESTRAVA')).toBeTruthy();
     expect(screen.getByText('Como você quer usar o app?')).toBeTruthy();
   });
 
@@ -37,12 +38,11 @@ describe('AUT-01: WelcomeScreen (escolha de perfil)', () => {
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/sign-up', params: { role: 'teacher' } });
   });
 
-  it('"Já tenho conta? Entrar" leva ao login', () => {
+  it('"Entrar" leva ao login', () => {
     render(<WelcomeScreen />);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Já tenho conta? Entrar' }));
+    fireEvent.press(screen.getByText('Entrar'));
 
-    expect(mockPush).toHaveBeenCalledTimes(1);
-    expect(mockPush).toHaveBeenCalledWith('/sign-in');
+    expect(mockReplace).toHaveBeenCalledWith('/sign-in');
   });
 });

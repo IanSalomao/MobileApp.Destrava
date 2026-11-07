@@ -1,3 +1,5 @@
+import { toE164BR } from '@/lib/phone';
+
 import type { SignUpInput } from './schemas';
 
 // AUT-09: consentimento (LGPD). Domínio puro: sem React, Expo ou Supabase.
@@ -17,12 +19,19 @@ export const MINOR_DATA_CLAUSE =
  * Metadados enviados no signUp (options.data). O trigger handle_new_user lê estes campos,
  * recusa o cadastro sem o aceite e grava versão, data e papel em profiles.
  */
-export function buildSignUpMetadata({ fullName, role }: Pick<SignUpInput, 'fullName' | 'role'>) {
+export function buildSignUpMetadata({
+  fullName,
+  role,
+  phone,
+}: Pick<SignUpInput, 'fullName' | 'role' | 'phone'>) {
+  const e164 = toE164BR(phone);
   return {
     full_name: fullName,
     role,
     terms_accepted: true,
     terms_version: TERMS_VERSION,
+    // E.164 para o botão do WhatsApp (RF09). Inválido fica nulo no banco; o usuário corrige no perfil.
+    ...(e164 ? { phone: e164 } : {}),
     ...(role === 'guardian' ? { minor_data_consent: true } : {}),
   };
 }
