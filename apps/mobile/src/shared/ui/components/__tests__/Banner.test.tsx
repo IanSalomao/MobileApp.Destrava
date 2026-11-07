@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react-native';
 import { Banner } from '../Banner';
 
 describe('UI-02a: Banner', () => {
-  it('renderiza o título padrão "Contato seguro" e a descrição informativa', () => {
-    render(
+  it('renderiza o título padrão "Contato seguro" e a descrição informativa', async () => {
+    await render(
       <Banner description="Após aceitar, o WhatsApp e seus dados profissionais serão liberados." />,
     );
 
@@ -14,8 +14,8 @@ describe('UI-02a: Banner', () => {
     ).toBeTruthy();
   });
 
-  it('permite título customizado e variantes semânticas', () => {
-    render(
+  it('permite título customizado e variantes semânticas', async () => {
+    await render(
       <Banner
         variant="success"
         title="Perfil profissional ativo"

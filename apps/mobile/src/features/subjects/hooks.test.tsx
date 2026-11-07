@@ -26,7 +26,7 @@ describe('useSubjects', () => {
     const data = [{ id: 'math', name: 'Matemática' }];
     mockListSubjects.mockResolvedValue(data);
 
-    const { result } = renderHook(() => useSubjects(), { wrapper: createWrapper() });
+    const { result } = await renderHook(() => useSubjects(), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(data);
@@ -35,7 +35,7 @@ describe('useSubjects', () => {
   it('entra em estado de erro quando a camada de dados falha', async () => {
     mockListSubjects.mockRejectedValue(new Error('boom'));
 
-    const { result } = renderHook(() => useSubjects(), { wrapper: createWrapper() });
+    const { result } = await renderHook(() => useSubjects(), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
   });

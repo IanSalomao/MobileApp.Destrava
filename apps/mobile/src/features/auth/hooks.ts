@@ -31,7 +31,7 @@ export function useSignInForm(repository: AuthRepository = defaultAuthRepository
 
   return {
     control: form.control,
-    submit: form.handleSubmit((values) => mutation.mutate(values)),
+    submit: () => form.handleSubmit((values) => mutation.mutate(values))(),
     isSubmitting: mutation.isPending,
     errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
   };
@@ -48,7 +48,7 @@ export function useForgotPasswordForm(repository: AuthRepository = defaultAuthRe
 
   return {
     control: form.control,
-    submit: form.handleSubmit((values) => mutation.mutate(values)),
+    submit: () => form.handleSubmit((values) => mutation.mutate(values))(),
     isSubmitting: mutation.isPending,
     // Mesmo texto para qualquer e-mail aceito (sem vazar se a conta existe).
     confirmationMessage: mutation.isSuccess ? PASSWORD_RESET_CONFIRMATION : null,
@@ -84,7 +84,7 @@ export function useSignUpForm(
 
   return {
     control: form.control,
-    submit: form.handleSubmit((values) => mutation.mutate(values)),
+    submit: () => form.handleSubmit((values) => mutation.mutate(values))(),
     isSubmitting: mutation.isPending,
     errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
     // Sem sessão após o cadastro = o projeto exige confirmação por e-mail.

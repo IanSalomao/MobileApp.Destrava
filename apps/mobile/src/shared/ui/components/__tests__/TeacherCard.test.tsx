@@ -15,9 +15,9 @@ describe('UI-02b: TeacherCard', () => {
     distanceLabel: '1–3 km',
   };
 
-  it('Dado um TeacherCard de professor verificado, Quando renderizado, Então exibe nome, iniciais, selo de verificado, matérias em chips, valor/hora, nota e faixa de distância', () => {
+  it('Dado um TeacherCard de professor verificado, Quando renderizado, Então exibe nome, iniciais, selo de verificado, matérias em chips, valor/hora, nota e faixa de distância', async () => {
     const onPress = jest.fn();
-    render(<TeacherCard {...defaultProps} onPress={onPress} />);
+    await render(<TeacherCard {...defaultProps} onPress={onPress} />);
 
     expect(screen.getByText('Profa. Mariana Silva')).toBeTruthy();
     expect(screen.getByText('Verificado')).toBeTruthy();
@@ -27,12 +27,12 @@ describe('UI-02b: TeacherCard', () => {
     expect(screen.getByText('4.9')).toBeTruthy();
     expect(screen.getByText('1–3 km')).toBeTruthy();
 
-    fireEvent.press(screen.getByTestId('teacher-card-teacher-1'));
+    await fireEvent.press(screen.getByTestId('teacher-card-teacher-1'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('Dado um professor não verificado, Quando renderizado, Então não exibe o selo Verificado', () => {
-    render(<TeacherCard {...defaultProps} isVerified={false} />);
+  it('Dado um professor não verificado, Quando renderizado, Então não exibe o selo Verificado', async () => {
+    await render(<TeacherCard {...defaultProps} isVerified={false} />);
 
     expect(screen.queryByText('Verificado')).toBeNull();
   });

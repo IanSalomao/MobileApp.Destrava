@@ -109,7 +109,7 @@ flowchart LR
 
 | Camada                    | Tecnologia                                  |
 | ------------------------- | ------------------------------------------- |
-| Frontend mobile           | React Native com Expo (SDK 57) e TypeScript |
+| Frontend mobile           | React Native com Expo (SDK 58) e TypeScript |
 | Navegação                 | Expo Router                                 |
 | Dados e formulários       | TanStack Query, react-hook-form e zod       |
 | BaaS                      | Supabase                                    |

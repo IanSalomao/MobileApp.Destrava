@@ -37,15 +37,15 @@ function renderWithQueryClient(ui: ReactNode) {
 }
 
 async function requestReset(email: string) {
-  fireEvent.changeText(screen.getByLabelText('E-mail'), email);
-  fireEvent.press(screen.getByRole('button', { name: 'Enviar link' }));
+  await fireEvent.changeText(screen.getByLabelText('E-mail'), email);
+  await fireEvent.press(screen.getByRole('button', { name: 'Enviar link' }));
 }
 
 describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha senha")', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('renderiza o campo de e-mail e o botão Enviar link', () => {
-    renderWithQueryClient(<ForgotPasswordScreen repository={new FakeAuthRepository()} />);
+  it('renderiza o campo de e-mail e o botão Enviar link', async () => {
+    await renderWithQueryClient(<ForgotPasswordScreen repository={new FakeAuthRepository()} />);
 
     expect(screen.getByText('Esqueci minha senha')).toBeTruthy();
     expect(screen.getByLabelText('E-mail')).toBeTruthy();
@@ -54,7 +54,7 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
 
   it('Dado e-mail inválido, Quando solicito, Então mostra o erro de campo e NÃO chama a API', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
 
     await requestReset('formato-invalido');
 
@@ -64,7 +64,7 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
 
   it('Dado e-mail cadastrado, Quando solicito, Então envia o e-mail normalizado e mostra a confirmação', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
 
     await requestReset('  PAI@destrava.com ');
 
@@ -74,7 +74,7 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
 
   it('Dado e-mail inexistente, Quando solicito, Então mostra EXATAMENTE a mesma confirmação (sem vazar a existência)', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
 
     await requestReset('ninguem@exemplo.com');
 
@@ -85,13 +85,15 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
 
   it('mostra o estado de carregamento e bloqueia o envio repetido enquanto aguarda', async () => {
     const fakeRepo = new FakeAuthRepository();
-    fakeRepo.delayMs = 50;
-    renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
+    fakeRepo.holdResponses = true;
+    await renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
 
     await requestReset('pai@destrava.com');
 
     await waitFor(() => expect(screen.getByTestId('button-loading-indicator')).toBeTruthy());
     expect(screen.getByLabelText('E-mail').props.editable).toBe(false);
+
+    fakeRepo.releaseResponses();
     await waitFor(() => expect(screen.getByText(PASSWORD_RESET_CONFIRMATION)).toBeTruthy());
     expect(fakeRepo.passwordResetRequests).toHaveLength(1);
   });
@@ -99,7 +101,7 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
   it('Dado falha de rede, Quando solicito, Então mostra erro e não finge que enviou', async () => {
     const fakeRepo = new FakeAuthRepository();
     fakeRepo.shouldFailWithNetworkError = true;
-    renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<ForgotPasswordScreen repository={fakeRepo} />);
 
     await requestReset('pai@destrava.com');
 
@@ -108,11 +110,11 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
   });
 
   it('depois da confirmação, "Voltar ao login" leva à tela de login', async () => {
-    renderWithQueryClient(<ForgotPasswordScreen repository={new FakeAuthRepository()} />);
+    await renderWithQueryClient(<ForgotPasswordScreen repository={new FakeAuthRepository()} />);
 
     await requestReset('pai@destrava.com');
     await waitFor(() => expect(screen.getByText(PASSWORD_RESET_CONFIRMATION)).toBeTruthy());
-    fireEvent.press(screen.getByRole('button', { name: 'Voltar ao login' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao login' }));
 
     expect(router.replace).toHaveBeenCalledWith('/sign-in');
   });
@@ -121,10 +123,10 @@ describe('AUT-04 ViewModel & Component: ForgotPasswordScreen ("Esqueci minha sen
 describe('AUT-04: acesso a partir do login', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('"Esqueci minha senha" na tela de login abre a recuperação', () => {
-    renderWithQueryClient(<SignInScreen repository={new FakeAuthRepository()} />);
+  it('"Esqueci minha senha" na tela de login abre a recuperação', async () => {
+    await renderWithQueryClient(<SignInScreen repository={new FakeAuthRepository()} />);
 
-    fireEvent.press(screen.getByText('Esqueci minha senha'));
+    await fireEvent.press(screen.getByText('Esqueci minha senha'));
 
     expect(router.push).toHaveBeenCalledWith('/forgot-password');
   });

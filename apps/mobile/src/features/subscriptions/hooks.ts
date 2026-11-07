@@ -34,12 +34,13 @@ export function useSubscriptionForm(onStarted?: () => void) {
     onSuccess: () => onStarted?.(),
   });
 
-  const submitWithCard = form.handleSubmit((values) => {
-    mutation.mutate({
-      planId: LAUNCH_PLAN_ID,
-      card: buildCardPayload(values.number, values.expiry),
-    });
-  });
+  const submitWithCard = () =>
+    form.handleSubmit((values) => {
+      mutation.mutate({
+        planId: LAUNCH_PLAN_ID,
+        card: buildCardPayload(values.number, values.expiry),
+      });
+    })();
 
   const submitWithoutCard = () => mutation.mutate({ planId: LAUNCH_PLAN_ID });
 

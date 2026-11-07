@@ -25,7 +25,7 @@ export function useGuardianProfileForm(onCreated?: () => void) {
 
   return {
     control: form.control,
-    submit: form.handleSubmit((values) => mutation.mutate(values)),
+    submit: () => form.handleSubmit((values) => mutation.mutate(values))(),
     isSubmitting: mutation.isPending,
     errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
   };

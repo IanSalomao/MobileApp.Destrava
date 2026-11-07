@@ -17,7 +17,7 @@ function mockQuery(state: Partial<ReturnType<typeof useSubjects>>) {
 describe('SubjectsList', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('mostra um chip por matéria', () => {
+  it('mostra um chip por matéria', async () => {
     mockQuery({
       data: [
         { id: 'math', name: 'Matemática' },
@@ -27,16 +27,16 @@ describe('SubjectsList', () => {
       isError: false,
     });
 
-    const { getByText } = render(<SubjectsList />);
+    const { getByText } = await render(<SubjectsList />);
 
     expect(getByText('Matemática')).toBeTruthy();
     expect(getByText('Física')).toBeTruthy();
   });
 
-  it('mostra mensagem de erro quando a query falha', () => {
+  it('mostra mensagem de erro quando a query falha', async () => {
     mockQuery({ data: undefined, isPending: false, isError: true });
 
-    const { getByText } = render(<SubjectsList />);
+    const { getByText } = await render(<SubjectsList />);
 
     expect(getByText('Não foi possível carregar as matérias.')).toBeTruthy();
   });

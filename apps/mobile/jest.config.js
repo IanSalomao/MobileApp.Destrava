@@ -6,6 +6,12 @@
 module.exports = {
   preset: 'jest-expo',
   testMatch: ['**/*.test.[jt]s?(x)'],
+  // O TextInput e a FlatList do RN 0.88 são carregados sob demanda, dentro do
+  // primeiro teste que os renderiza. Com o cache do Jest frio (sempre, na CI) e
+  // os workers transformando o react-native em paralelo, esse teste passa dos
+  // 5 s padrão; com a máquina carregada, chegou a passar de 20 s. Com cache
+  // quente, a suíte toda roda em ~4 s.
+  testTimeout: 60000,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

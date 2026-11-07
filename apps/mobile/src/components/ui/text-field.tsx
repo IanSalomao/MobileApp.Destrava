@@ -5,6 +5,7 @@ import {
   TextInput,
   View,
   type StyleProp,
+  type TextInputInstance,
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
@@ -23,7 +24,7 @@ export type TextFieldProps = TextInputProps & {
   isPassword?: boolean;
   maskFormatter?: (value: string) => string;
   containerStyle?: StyleProp<ViewStyle>;
-  ref?: Ref<TextInput>;
+  ref?: Ref<TextInputInstance>;
 };
 
 export type InputProps = TextFieldProps;

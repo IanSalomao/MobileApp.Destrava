@@ -39,9 +39,9 @@ function renderWithQueryClient(ui: ReactNode) {
 }
 
 describe('AUT-02 ViewModel & Component: SignInScreen ("Entre na sua conta")', () => {
-  it('renderiza a tela "Entre na sua conta" com campos de E-mail, Senha e botão Entrar', () => {
+  it('renderiza a tela "Entre na sua conta" com campos de E-mail, Senha e botão Entrar', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
 
     expect(screen.getByText('Entre na sua conta')).toBeTruthy();
     expect(screen.getByLabelText('E-mail')).toBeTruthy();
@@ -51,11 +51,11 @@ describe('AUT-02 ViewModel & Component: SignInScreen ("Entre na sua conta")', ()
 
   it('Dado formato inválido (Zod), Quando tento entrar, Então exibe erros de campo e NÃO chama a API', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
 
-    fireEvent.changeText(screen.getByLabelText('E-mail'), 'formato-invalido');
-    fireEvent.changeText(screen.getByLabelText('Senha'), '');
-    fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
+    await fireEvent.changeText(screen.getByLabelText('E-mail'), 'formato-invalido');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), '');
+    await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => {
       expect(screen.getByText('Informe um e-mail válido.')).toBeTruthy();
@@ -67,11 +67,11 @@ describe('AUT-02 ViewModel & Component: SignInScreen ("Entre na sua conta")', ()
 
   it('Dado credenciais inválidas, Quando tento entrar, Então mostra "E-mail ou senha inválidos" sem revelar qual campo errou', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
 
-    fireEvent.changeText(screen.getByLabelText('E-mail'), 'pai@destrava.com');
-    fireEvent.changeText(screen.getByLabelText('Senha'), 'senha-errada');
-    fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
+    await fireEvent.changeText(screen.getByLabelText('E-mail'), 'pai@destrava.com');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), 'senha-errada');
+    await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => {
       expect(screen.getByText('E-mail ou senha inválidos')).toBeTruthy();
@@ -84,11 +84,11 @@ describe('AUT-02 ViewModel & Component: SignInScreen ("Entre na sua conta")', ()
 
   it('Dado credenciais válidas, Quando clico em Entrar, Então envia dados normalizados para o AuthRepository', async () => {
     const fakeRepo = new FakeAuthRepository();
-    renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
+    await renderWithQueryClient(<SignInScreen repository={fakeRepo} />);
 
-    fireEvent.changeText(screen.getByLabelText('E-mail'), '  PAI@destrava.com ');
-    fireEvent.changeText(screen.getByLabelText('Senha'), 'password123');
-    fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
+    await fireEvent.changeText(screen.getByLabelText('E-mail'), '  PAI@destrava.com ');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), 'password123');
+    await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => {
       expect(fakeRepo.calls).toEqual([{ email: 'pai@destrava.com', password: 'password123' }]);

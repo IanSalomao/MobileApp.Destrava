@@ -12,9 +12,9 @@ const STATUS_TABS: TabOption<RequestStatusTab>[] = [
 ];
 
 describe('UI-02b: Tabs', () => {
-  it('Dado Tabs de status (Pendentes / Aceitas / Recusadas), Quando clicado em outra aba, Então dispara onChange e respeita altura >= 44pt', () => {
+  it('Dado Tabs de status (Pendentes / Aceitas / Recusadas), Quando clicado em outra aba, Então dispara onChange e respeita altura >= 44pt', async () => {
     const onChange = jest.fn();
-    render(<Tabs options={STATUS_TABS} activeKey="pending" onChange={onChange} />);
+    await render(<Tabs options={STATUS_TABS} activeKey="pending" onChange={onChange} />);
 
     const pendingTab = screen.getByRole('tab', { name: /Pendentes/i });
     const flatStyle = StyleSheet.flatten(pendingTab.props.style);
@@ -23,7 +23,7 @@ describe('UI-02b: Tabs', () => {
     expect(pendingTab.props.accessibilityState.selected).toBe(true);
 
     const acceptedTab = screen.getByRole('tab', { name: /Aceitas/i });
-    fireEvent.press(acceptedTab);
+    await fireEvent.press(acceptedTab);
 
     expect(onChange).toHaveBeenCalledWith('accepted');
   });

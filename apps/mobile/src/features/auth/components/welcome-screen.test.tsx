@@ -13,35 +13,35 @@ const mockReplace = router.replace as jest.Mock;
 describe('AUT-01: WelcomeScreen (escolha de perfil)', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('mostra o título e a pergunta da tela', () => {
-    render(<WelcomeScreen />);
+  it('mostra o título e a pergunta da tela', async () => {
+    await render(<WelcomeScreen />);
 
     expect(screen.getByText('BEM-VINDO AO DESTRAVA')).toBeTruthy();
     expect(screen.getByText('Como você quer usar o app?')).toBeTruthy();
   });
 
-  it('"Sou pai ou responsável" leva ao cadastro do responsável', () => {
-    render(<WelcomeScreen />);
+  it('"Sou pai ou responsável" leva ao cadastro do responsável', async () => {
+    await render(<WelcomeScreen />);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Sou pai ou responsável' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sou pai ou responsável' }));
 
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/sign-up', params: { role: 'guardian' } });
   });
 
-  it('"Sou professor" leva ao cadastro do professor', () => {
-    render(<WelcomeScreen />);
+  it('"Sou professor" leva ao cadastro do professor', async () => {
+    await render(<WelcomeScreen />);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Sou professor' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sou professor' }));
 
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/sign-up', params: { role: 'teacher' } });
   });
 
-  it('"Entrar" leva ao login', () => {
-    render(<WelcomeScreen />);
+  it('"Entrar" leva ao login', async () => {
+    await render(<WelcomeScreen />);
 
-    fireEvent.press(screen.getByText('Entrar'));
+    await fireEvent.press(screen.getByText('Entrar'));
 
     expect(mockReplace).toHaveBeenCalledWith('/sign-in');
   });

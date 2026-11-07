@@ -4,8 +4,8 @@ import { render, screen, fireEvent } from '@testing-library/react-native';
 import { DataList } from '../DataList';
 
 describe('UI-02b: DataList Wrapper', () => {
-  it('exibe estado de loading quando loading=true e lista vazia', () => {
-    render(
+  it('exibe estado de loading quando loading=true e lista vazia', async () => {
+    await render(
       <DataList
         data={[]}
         loading
@@ -17,9 +17,9 @@ describe('UI-02b: DataList Wrapper', () => {
     expect(screen.getByTestId('datalist-loading')).toBeTruthy();
   });
 
-  it('exibe estado de erro e permite tentar novamente', () => {
+  it('exibe estado de erro e permite tentar novamente', async () => {
     const onRetry = jest.fn();
-    render(
+    await render(
       <DataList
         data={[]}
         errorMessage="Não foi possível carregar os professores."
@@ -31,12 +31,12 @@ describe('UI-02b: DataList Wrapper', () => {
 
     expect(screen.getByText('Não foi possível carregar os professores.')).toBeTruthy();
 
-    fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('exibe estado vazio customizado quando não há itens', () => {
-    render(
+  it('exibe estado vazio customizado quando não há itens', async () => {
+    await render(
       <DataList
         data={[]}
         emptyTitle="Nenhum professor encontrado"
@@ -50,13 +50,13 @@ describe('UI-02b: DataList Wrapper', () => {
     expect(screen.getByText('Tente ampliar os filtros da sua busca.')).toBeTruthy();
   });
 
-  it('renderiza os itens da lista quando há dados', () => {
+  it('renderiza os itens da lista quando há dados', async () => {
     const items = [
       { id: '1', name: 'Prof. João' },
       { id: '2', name: 'Profa. Ana' },
     ];
 
-    render(
+    await render(
       <DataList
         data={items}
         keyExtractor={(item) => item.id}

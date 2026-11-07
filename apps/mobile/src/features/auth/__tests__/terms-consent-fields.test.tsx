@@ -29,41 +29,41 @@ function Harness({ role }: { role: SignUpInput['role'] }) {
 describe('AUT-09: TermsConsentFields', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('começa desmarcado e marca ao tocar', () => {
-    render(<Harness role="teacher" />);
+  it('começa desmarcado e marca ao tocar', async () => {
+    await render(<Harness role="teacher" />);
     const checkbox = screen.getByRole('checkbox', { name: TERMS_LABEL });
 
     expect(checkbox.props.accessibilityState.checked).toBe(false);
-    fireEvent.press(checkbox);
+    await fireEvent.press(checkbox);
     expect(
       screen.getByRole('checkbox', { name: TERMS_LABEL }).props.accessibilityState.checked,
     ).toBe(true);
   });
 
-  it('abre os documentos pelos links do rótulo', () => {
-    render(<Harness role="teacher" />);
+  it('abre os documentos pelos links do rótulo', async () => {
+    await render(<Harness role="teacher" />);
 
-    fireEvent.press(screen.getByText('Termos de Uso'));
-    fireEvent.press(screen.getByText('Política de Privacidade'));
+    await fireEvent.press(screen.getByText('Termos de Uso'));
+    await fireEvent.press(screen.getByText('Política de Privacidade'));
 
     expect(mockPush).toHaveBeenNthCalledWith(1, '/terms');
     expect(mockPush).toHaveBeenNthCalledWith(2, '/privacy');
   });
 
-  it('professor não vê a cláusula sobre dados do menor', () => {
-    render(<Harness role="teacher" />);
+  it('professor não vê a cláusula sobre dados do menor', async () => {
+    await render(<Harness role="teacher" />);
 
     expect(screen.queryByText(MINOR_DATA_CLAUSE)).toBeNull();
   });
 
-  it('responsável vê a cláusula específica e marca separadamente', () => {
-    render(<Harness role="guardian" />);
+  it('responsável vê a cláusula específica e marca separadamente', async () => {
+    await render(<Harness role="guardian" />);
     const clause = screen.getByRole('checkbox', {
       name: 'Consentimento do responsável para dados do aluno menor de idade',
     });
 
     expect(screen.getByText(MINOR_DATA_CLAUSE)).toBeTruthy();
-    fireEvent.press(clause);
+    await fireEvent.press(clause);
     expect(
       screen.getByRole('checkbox', {
         name: 'Consentimento do responsável para dados do aluno menor de idade',

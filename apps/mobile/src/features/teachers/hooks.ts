@@ -103,26 +103,27 @@ export function useTeacherProfileForm(onSubmitted?: () => void) {
 
   const goBack = () => setStep((current) => Math.max(1, current - 1));
 
-  const submit = form.handleSubmit((values) => {
-    if (!teacherId || !identityDocument) return;
-    mutation.mutate({
-      teacherId,
-      fullName: values.fullName,
-      cpf: values.cpf,
-      city: values.city,
-      state: values.state,
-      subjectIds: values.subjectIds,
-      languageIds: values.languageIds,
-      bio: values.bio,
-      tutoringTypes: values.tutoringTypes,
-      hourlyRateCents: currencyToCents(values.hourlyRate) ?? 0,
-      weekdays: values.weekdays,
-      periods: values.periods,
-      avatar,
-      identityDocument,
-      certificates,
-    });
-  });
+  const submit = () =>
+    form.handleSubmit((values) => {
+      if (!teacherId || !identityDocument) return;
+      mutation.mutate({
+        teacherId,
+        fullName: values.fullName,
+        cpf: values.cpf,
+        city: values.city,
+        state: values.state,
+        subjectIds: values.subjectIds,
+        languageIds: values.languageIds,
+        bio: values.bio,
+        tutoringTypes: values.tutoringTypes,
+        hourlyRateCents: currencyToCents(values.hourlyRate) ?? 0,
+        weekdays: values.weekdays,
+        periods: values.periods,
+        avatar,
+        identityDocument,
+        certificates,
+      });
+    })();
 
   return {
     control: form.control,
