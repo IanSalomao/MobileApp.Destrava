@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { BRAZILIAN_STATES } from '@/features/catalog/types';
 import { currencyToCents } from '@/lib/masks';
 import { isValidCpf } from '@/lib/cpf';
 
@@ -8,11 +9,9 @@ import { isValidCpf } from '@/lib/cpf';
 export const teacherProfileSchema = z.object({
   fullName: z.string().trim().min(2, 'Informe seu nome.').max(120, 'Use no máximo 120 caracteres.'),
   cpf: z.string().refine(isValidCpf, 'Informe um CPF válido.'),
-  city: z.string().trim().min(1, 'Informe a cidade.').max(80, 'Use no máximo 80 caracteres.'),
-  state: z
-    .string()
-    .trim()
-    .regex(/^[A-Za-z]{2}$/, 'Informe a UF (2 letras).'),
+  // Estado e cidade vêm de listas predefinidas: enum brazilian_state e tabela cities (IBGE).
+  state: z.enum(BRAZILIAN_STATES, { message: 'Selecione o estado.' }),
+  cityId: z.number({ message: 'Selecione a cidade.' }).int(),
   subjectIds: z.array(z.string()).min(1, 'Selecione ao menos uma matéria.'),
   languageIds: z.array(z.string()).min(1, 'Selecione ao menos um idioma.'),
   bio: z.string().trim().max(1000, 'Use no máximo 1000 caracteres.').optional(),
@@ -37,7 +36,7 @@ export type TeacherProfileInput = z.infer<typeof teacherProfileSchema>;
 
 // Campos validados ao avançar cada etapa do formulário.
 export const TEACHER_STEP_FIELDS = {
-  1: ['fullName', 'cpf', 'city', 'state'],
+  1: ['fullName', 'cpf', 'state', 'cityId'],
   2: ['subjectIds', 'languageIds', 'bio'],
   3: ['tutoringTypes', 'hourlyRate', 'weekdays', 'periods'],
 } as const satisfies Record<number, readonly (keyof TeacherProfileInput)[]>;

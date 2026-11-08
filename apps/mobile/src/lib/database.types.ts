@@ -23,6 +23,25 @@ export type Database = {
   };
   public: {
     Tables: {
+      cities: {
+        Row: {
+          id: number;
+          name: string;
+          state: Database['public']['Enums']['brazilian_state'];
+        };
+        ComputedFields: never;
+        Insert: {
+          id: number;
+          name: string;
+          state: Database['public']['Enums']['brazilian_state'];
+        };
+        Update: {
+          id?: number;
+          name?: string;
+          state?: Database['public']['Enums']['brazilian_state'];
+        };
+        Relationships: [];
+      };
       contact_details: {
         Row: {
           phone: string | null;
@@ -727,7 +746,7 @@ export type Database = {
           available_periods: Database['public']['Enums']['day_period'][];
           available_weekdays: number[];
           bio: string | null;
-          city: string | null;
+          city_id: number | null;
           created_at: string;
           education_levels: Database['public']['Enums']['education_level'][];
           hourly_rate_cents: number | null;
@@ -737,7 +756,7 @@ export type Database = {
           postal_code: string | null;
           rating_average: number | null;
           rating_count: number;
-          state: string | null;
+          state: Database['public']['Enums']['brazilian_state'] | null;
           tutoring_types: Database['public']['Enums']['tutoring_type'][];
           updated_at: string;
         };
@@ -746,7 +765,7 @@ export type Database = {
           available_periods?: Database['public']['Enums']['day_period'][];
           available_weekdays?: number[];
           bio?: string | null;
-          city?: string | null;
+          city_id?: number | null;
           created_at?: string;
           education_levels?: Database['public']['Enums']['education_level'][];
           hourly_rate_cents?: number | null;
@@ -756,7 +775,7 @@ export type Database = {
           postal_code?: string | null;
           rating_average?: number | null;
           rating_count?: number;
-          state?: string | null;
+          state?: Database['public']['Enums']['brazilian_state'] | null;
           tutoring_types?: Database['public']['Enums']['tutoring_type'][];
           updated_at?: string;
         };
@@ -764,7 +783,7 @@ export type Database = {
           available_periods?: Database['public']['Enums']['day_period'][];
           available_weekdays?: number[];
           bio?: string | null;
-          city?: string | null;
+          city_id?: number | null;
           created_at?: string;
           education_levels?: Database['public']['Enums']['education_level'][];
           hourly_rate_cents?: number | null;
@@ -774,11 +793,18 @@ export type Database = {
           postal_code?: string | null;
           rating_average?: number | null;
           rating_count?: number;
-          state?: string | null;
+          state?: Database['public']['Enums']['brazilian_state'] | null;
           tutoring_types?: Database['public']['Enums']['tutoring_type'][];
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'teachers_city_fkey';
+            columns: ['state', 'city_id'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['state', 'id'];
+          },
           {
             foreignKeyName: 'teachers_id_fkey';
             columns: ['id'];
@@ -855,21 +881,22 @@ export type Database = {
       };
       search_teachers: {
         Args: {
-          p_city?: string;
+          p_city_id?: number;
           p_language_ids?: string[];
           p_limit?: number;
           p_max_hourly_rate_cents?: number;
           p_min_hourly_rate_cents?: number;
           p_offset?: number;
           p_query?: string;
-          p_state?: string;
+          p_state?: Database['public']['Enums']['brazilian_state'];
           p_subject_ids?: string[];
           p_tutoring_types?: Database['public']['Enums']['tutoring_type'][];
           p_weekdays?: number[];
         };
         Returns: {
           avatar_url: string;
-          city: string;
+          city_id: number;
+          city_name: string;
           education_levels: Database['public']['Enums']['education_level'][];
           full_name: string;
           hourly_rate_cents: number;
@@ -879,7 +906,7 @@ export type Database = {
           neighborhood: string;
           rating_average: number;
           rating_count: number;
-          state: string;
+          state: Database['public']['Enums']['brazilian_state'];
           subject_ids: string[];
           total_count: number;
           tutoring_types: Database['public']['Enums']['tutoring_type'][];
@@ -952,6 +979,34 @@ export type Database = {
       };
     };
     Enums: {
+      brazilian_state:
+        | 'AC'
+        | 'AL'
+        | 'AM'
+        | 'AP'
+        | 'BA'
+        | 'CE'
+        | 'DF'
+        | 'ES'
+        | 'GO'
+        | 'MA'
+        | 'MG'
+        | 'MS'
+        | 'MT'
+        | 'PA'
+        | 'PB'
+        | 'PE'
+        | 'PI'
+        | 'PR'
+        | 'RJ'
+        | 'RN'
+        | 'RO'
+        | 'RR'
+        | 'RS'
+        | 'SC'
+        | 'SE'
+        | 'SP'
+        | 'TO';
       contact_request_status: 'pending' | 'accepted' | 'declined' | 'expired' | 'cancelled';
       day_period: 'morning' | 'afternoon' | 'evening';
       education_level: 'elementary_early' | 'elementary_late' | 'high_school';
@@ -1097,6 +1152,35 @@ export const Constants = {
   },
   public: {
     Enums: {
+      brazilian_state: [
+        'AC',
+        'AL',
+        'AM',
+        'AP',
+        'BA',
+        'CE',
+        'DF',
+        'ES',
+        'GO',
+        'MA',
+        'MG',
+        'MS',
+        'MT',
+        'PA',
+        'PB',
+        'PE',
+        'PI',
+        'PR',
+        'RJ',
+        'RN',
+        'RO',
+        'RR',
+        'RS',
+        'SC',
+        'SE',
+        'SP',
+        'TO',
+      ],
       contact_request_status: ['pending', 'accepted', 'declined', 'expired', 'cancelled'],
       day_period: ['morning', 'afternoon', 'evening'],
       education_level: ['elementary_early', 'elementary_late', 'high_school'],

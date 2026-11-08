@@ -1,8 +1,12 @@
-import type { Enums, Tables } from '@/lib/database.types';
+import { Constants, type Enums, type Tables } from '@/lib/database.types';
 
 // Idioma do catálogo (ex.: "Inglês"). Dado de referência, só leitura; entra por migração.
 export type Language = Pick<Tables<'languages'>, 'id' | 'name'>;
 
+// Município do IBGE (id = código IBGE de 7 dígitos). Dado de referência, entra por migração.
+export type City = Pick<Tables<'cities'>, 'id' | 'name'>;
+
+export type BrazilianState = Enums<'brazilian_state'>;
 export type SchoolGrade = Enums<'school_grade'>;
 export type DayPeriod = Enums<'day_period'>;
 export type TutoringType = Enums<'tutoring_type'>;
@@ -51,3 +55,42 @@ export const SCHOOL_GRADE_OPTIONS = SCHOOL_GRADES.map((value) => ({
   value,
   label: SCHOOL_GRADE_LABELS[value],
 }));
+
+export const BRAZILIAN_STATE_LABELS: Record<BrazilianState, string> = {
+  AC: 'Acre',
+  AL: 'Alagoas',
+  AM: 'Amazonas',
+  AP: 'Amapá',
+  BA: 'Bahia',
+  CE: 'Ceará',
+  DF: 'Distrito Federal',
+  ES: 'Espírito Santo',
+  GO: 'Goiás',
+  MA: 'Maranhão',
+  MG: 'Minas Gerais',
+  MS: 'Mato Grosso do Sul',
+  MT: 'Mato Grosso',
+  PA: 'Pará',
+  PB: 'Paraíba',
+  PE: 'Pernambuco',
+  PI: 'Piauí',
+  PR: 'Paraná',
+  RJ: 'Rio de Janeiro',
+  RN: 'Rio Grande do Norte',
+  RO: 'Rondônia',
+  RR: 'Roraima',
+  RS: 'Rio Grande do Sul',
+  SC: 'Santa Catarina',
+  SE: 'Sergipe',
+  SP: 'São Paulo',
+  TO: 'Tocantins',
+};
+
+/** Siglas das UFs, na ordem do enum brazilian_state (vem dos tipos gerados pelo Supabase). */
+export const BRAZILIAN_STATES = Constants.public.Enums.brazilian_state;
+
+/** Opções {value,label} para o SelectField de estado, em ordem alfabética do nome. */
+export const BRAZILIAN_STATE_OPTIONS = BRAZILIAN_STATES.map((value) => ({
+  value,
+  label: BRAZILIAN_STATE_LABELS[value],
+})).sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'));

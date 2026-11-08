@@ -64,13 +64,15 @@ declare
     'Samuel Brito', 'Eliane Borges', 'Murilo Guimarães', 'Simone Macedo', 'Otávio Morais'
   ];
 
-  -- Cidades, estados, bairros, CEPs e coordenadas variadas (SP, RJ, MG, BA, PR)
-  v_cities text[] := array[
-    'São Paulo', 'São Paulo', 'São Paulo', 'São Paulo',
-    'Rio de Janeiro', 'Rio de Janeiro',
-    'Belo Horizonte', 'Feira de Santana', 'Salvador', 'Curitiba'
+  -- Cidades, estados, bairros, CEPs e coordenadas variadas (SP, RJ, MG, BA, PR).
+  -- Cidade pelo código IBGE (public.cities): São Paulo, Rio de Janeiro, Belo Horizonte,
+  -- Feira de Santana, Salvador e Curitiba.
+  v_city_ids integer[] := array[
+    3550308, 3550308, 3550308, 3550308,
+    3304557, 3304557,
+    3106200, 2910800, 2927408, 4106902
   ];
-  v_states text[] := array[
+  v_states public.brazilian_state[] := array[
     'SP', 'SP', 'SP', 'SP',
     'RJ', 'RJ',
     'MG', 'BA', 'BA', 'PR'
@@ -201,7 +203,7 @@ begin
       end,
       postal_code = v_postals[v_loc_idx],
       neighborhood = v_neighborhoods[v_loc_idx],
-      city = v_cities[v_loc_idx],
+      city_id = v_city_ids[v_loc_idx],
       state = v_states[v_loc_idx]
     where id = v_teacher_id;
 

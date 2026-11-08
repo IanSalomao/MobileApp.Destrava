@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { useSession } from '@/features/auth/session-provider';
+import { useCities } from '@/features/catalog/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import { currencyToCents } from '@/lib/masks';
 
@@ -27,8 +28,8 @@ export function useTeacherProfileForm(onSubmitted?: () => void) {
     defaultValues: {
       fullName: '',
       cpf: '',
-      city: '',
-      state: '',
+      state: undefined,
+      cityId: undefined,
       subjectIds: [],
       languageIds: [],
       bio: '',
@@ -46,6 +47,25 @@ export function useTeacherProfileForm(onSubmitted?: () => void) {
       form.setValue('fullName', profileName);
     }
   }, [profileName, form]);
+
+  const selectedState = useWatch({ control: form.control, name: 'state' });
+
+  // A cidade depende do estado: trocar o estado limpa a cidade escolhida antes.
+  const previousStateRef = useRef(selectedState);
+  useEffect(() => {
+    if (previousStateRef.current === selectedState) return;
+    previousStateRef.current = selectedState;
+    form.resetField('cityId');
+  }, [selectedState, form]);
+
+  const cities = useCities(selectedState);
+  const cityOptions = (cities.data ?? []).map((city) => ({ value: city.id, label: city.name }));
+  // O campo de cidade só aparece depois que o estado é escolhido.
+  const cityPlaceholder = cities.isLoading
+    ? 'Carregando cidades...'
+    : cities.isError
+      ? 'Não foi possível carregar as cidades'
+      : 'Selecione a cidade';
 
   const [step, setStep] = useState(1);
   const [avatar, setAvatar] = useState<PickedFile | null>(null);
@@ -110,8 +130,8 @@ export function useTeacherProfileForm(onSubmitted?: () => void) {
         teacherId,
         fullName: values.fullName,
         cpf: values.cpf,
-        city: values.city,
         state: values.state,
+        cityId: values.cityId,
         subjectIds: values.subjectIds,
         languageIds: values.languageIds,
         bio: values.bio,
@@ -127,6 +147,10 @@ export function useTeacherProfileForm(onSubmitted?: () => void) {
 
   return {
     control: form.control,
+    cityOptions,
+    cityPlaceholder,
+    showCityField: Boolean(selectedState),
+    isCityDisabled: cities.isLoading || cities.isError,
     step,
     totalSteps: TOTAL_STEPS,
     goNext,

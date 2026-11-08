@@ -54,8 +54,9 @@ export type SaveTeacherProfileParams = {
   teacherId: string;
   fullName: string;
   cpf: string;
-  city: string;
-  state: string;
+  state: Enums<'brazilian_state'>;
+  /** Código IBGE do município (public.cities), do mesmo estado de state. */
+  cityId: number;
   subjectIds: string[];
   languageIds: string[];
   bio?: string;
@@ -99,8 +100,8 @@ export async function saveAndSubmitTeacherProfile(
       tutoring_types: params.tutoringTypes,
       available_weekdays: params.weekdays,
       available_periods: params.periods,
-      city: params.city.trim(),
-      state: params.state.trim().toUpperCase(),
+      state: params.state,
+      city_id: params.cityId,
     })
     .eq('id', teacherId);
   if (teacherError) throw teacherError;

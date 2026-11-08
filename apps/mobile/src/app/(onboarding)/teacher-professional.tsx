@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FormChipGroup } from '@/components/form/form-chip-group';
 import { FormOptionCards } from '@/components/form/form-option-cards';
+import { FormSelectField } from '@/components/form/form-select-field';
 import { FormTextField } from '@/components/form/form-text-field';
 import { FormWeekdayPicker } from '@/components/form/form-weekday-picker';
 import { AvatarPicker } from '@/components/ui/avatar-picker';
@@ -12,7 +13,7 @@ import { FilePickerField } from '@/components/ui/file-picker-field';
 import { Screen } from '@/components/ui/screen';
 import { StepHeader } from '@/components/ui/step-header';
 import { Text } from '@/components/ui/text';
-import { DAY_PERIODS, DAY_PERIOD_LABELS } from '@/features/catalog/types';
+import { BRAZILIAN_STATE_OPTIONS, DAY_PERIODS, DAY_PERIOD_LABELS } from '@/features/catalog/types';
 import { useLanguages } from '@/features/catalog/hooks';
 import { useTeacherProfileForm } from '@/features/teachers/hooks';
 import { useSubjects } from '@/features/subjects/hooks';
@@ -90,25 +91,27 @@ export default function TeacherProfessionalScreen() {
             maskFormatter={maskCpf}
             leftIcon={<Ionicons name="document-outline" size={20} color={colors.textMuted} />}
           />
-          <View style={styles.locationRow}>
-            <FormTextField
+          <FormSelectField
+            control={vm.control}
+            name="state"
+            label="Estado"
+            placeholder="Selecione o estado"
+            modalTitle="Estado"
+            options={BRAZILIAN_STATE_OPTIONS}
+          />
+          {vm.showCityField ? (
+            <FormSelectField
               control={vm.control}
-              name="city"
+              name="cityId"
               label="Cidade"
-              placeholder="São Paulo"
-              leftIcon={<Ionicons name="location-outline" size={20} color={colors.textMuted} />}
-              containerStyle={styles.cityField}
+              placeholder={vm.cityPlaceholder}
+              modalTitle="Cidade"
+              options={vm.cityOptions}
+              disabled={vm.isCityDisabled}
+              searchable
+              searchPlaceholder="Buscar cidade"
             />
-            <FormTextField
-              control={vm.control}
-              name="state"
-              label="UF"
-              placeholder="SP"
-              autoCapitalize="characters"
-              maxLength={2}
-              containerStyle={styles.stateField}
-            />
-          </View>
+          ) : null}
           <FilePickerField
             title="Documento com foto"
             hint="RG ou CNH em PDF, JPG ou PNG"
@@ -218,16 +221,6 @@ export default function TeacherProfessionalScreen() {
 }
 
 const styles = StyleSheet.create({
-  locationRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  cityField: {
-    flex: 1,
-  },
-  stateField: {
-    width: 88,
-  },
   textarea: {
     minHeight: 96,
     textAlignVertical: 'top',

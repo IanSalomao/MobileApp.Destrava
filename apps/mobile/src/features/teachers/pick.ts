@@ -1,6 +1,7 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
+import { Platform } from 'react-native';
 
 import type { PickedFile } from './types';
 
@@ -32,18 +33,32 @@ export async function pickImage(): Promise<PickedFile | null> {
   };
 }
 
+/**
+ * Conteúdo do documento em base64, sem o prefixo data:. No web o expo-file-system não existe: o
+ * próprio seletor lê o arquivo (opção base64) e devolve um data URL.
+ */
+async function readDocumentBase64(
+  asset: DocumentPicker.DocumentPickerAsset,
+): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    if (!asset.base64) return null;
+    return asset.base64.slice(asset.base64.indexOf(',') + 1);
+  }
+  return FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.Base64 });
+}
+
 /** Abre o seletor de documentos (PDF, JPG ou PNG) e lê o conteúdo em base64. */
 export async function pickDocument(): Promise<PickedFile | null> {
   const result = await DocumentPicker.getDocumentAsync({
     type: DOCUMENT_TYPES,
     copyToCacheDirectory: true,
+    base64: true,
   });
   if (result.canceled) return null;
 
   const asset = result.assets[0];
-  const base64 = await FileSystem.readAsStringAsync(asset.uri, {
-    encoding: FileSystem.EncodingType.Base64,
-  });
+  const base64 = await readDocumentBase64(asset);
+  if (!base64) return null;
 
   return {
     uri: asset.uri,

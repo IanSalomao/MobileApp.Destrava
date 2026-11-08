@@ -5,13 +5,16 @@ import { SelectField, type SelectOption } from '@/components/ui/select-field';
 type FormSelectFieldProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
-  options: SelectOption<string>[];
+  options: SelectOption<string | number>[];
   label?: string;
   placeholder?: string;
   modalTitle?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  disabled?: boolean;
 };
 
-// SelectField ligado ao react-hook-form (ex.: ano escolar).
+// SelectField ligado ao react-hook-form (ex.: ano escolar, estado, cidade).
 export function FormSelectField<T extends FieldValues>({
   control,
   name,
@@ -19,6 +22,9 @@ export function FormSelectField<T extends FieldValues>({
   label,
   placeholder,
   modalTitle,
+  searchable,
+  searchPlaceholder,
+  disabled,
 }: FormSelectFieldProps<T>) {
   const {
     field: { value, onChange },
@@ -31,9 +37,12 @@ export function FormSelectField<T extends FieldValues>({
       placeholder={placeholder}
       modalTitle={modalTitle}
       options={options}
-      value={(value as string | undefined) ?? null}
+      value={(value as string | number | undefined) ?? null}
       onChange={onChange}
       error={error?.message}
+      searchable={searchable}
+      searchPlaceholder={searchPlaceholder}
+      disabled={disabled}
     />
   );
 }
