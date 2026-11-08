@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { canAccess } from '@/features/auth/route-access';
+import { canAccess, homeHref } from '@/features/auth/route-access';
 import { SessionProvider, useSession } from '@/features/auth/session-provider';
 import { useMyProfile } from '@/features/profile/hooks';
 import { queryClient } from '@/lib/query-client';
@@ -56,25 +56,31 @@ function RootNavigator() {
   if (!isReady) return null;
 
   const access = { isSignedIn: !!session, role: profile.data?.role };
+  // Quem cai numa área barrada vai para as abas (logado) ou para a escolha de perfil (deslogado).
+  const home = homeHref(access);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* Abas são públicas: visitantes navegam sem conta (RF03). */}
-      <Stack.Screen name="(tabs)" />
-      {/* Login e cadastro só existem para quem está deslogado; ao entrar, o usuário volta às abas. */}
-      <Stack.Protected guard={canAccess('guest', access)}>
-        <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
+      {/* Cadastro obrigatório (RF03): sem sessão não há navegação pelo app. Quem não está logado
+          vai para a escolha de perfil, inclusive ao sair da conta. */}
+      <Stack.Protected guard={access.isSignedIn} redirectTo={home}>
+        <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
+      {/* Cadastro e login só existem para quem está deslogado; ao entrar, o usuário vai às abas. */}
+      <Stack.Protected guard={canAccess('guest', access)} redirectTo={home}>
+        <Stack.Screen name="(auth)" />
       </Stack.Protected>
       {/* Onboarding pós-cadastro (etapa 2 do responsável; assinatura e perfil do professor): exige
           apenas estar logado. As telas são alcançadas por router.replace logo após o cadastro. */}
-      <Stack.Protected guard={access.isSignedIn}>
+      <Stack.Protected guard={access.isSignedIn} redirectTo={home}>
         <Stack.Screen name="(onboarding)" />
       </Stack.Protected>
-      {/* Áreas por papel (AUT-05): quem não tem o papel é redirecionado para as abas. */}
-      <Stack.Protected guard={canAccess('guardian', access)}>
+      {/* Áreas por papel (AUT-05): quem não tem o papel vai para as abas, ou para a escolha de
+          perfil se nem está logado. */}
+      <Stack.Protected guard={canAccess('guardian', access)} redirectTo={home}>
         <Stack.Screen name="(guardian)" />
       </Stack.Protected>
-      <Stack.Protected guard={canAccess('teacher', access)}>
+      <Stack.Protected guard={canAccess('teacher', access)} redirectTo={home}>
         <Stack.Screen name="(teacher)" />
       </Stack.Protected>
     </Stack>

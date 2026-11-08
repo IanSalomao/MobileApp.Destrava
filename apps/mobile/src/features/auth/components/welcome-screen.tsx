@@ -8,8 +8,8 @@ import { Text } from '@/components/ui/text';
 import type { UserRole } from '@/features/profile/types';
 import { colors, radius, spacing } from '@/theme';
 
-// AUT-01: primeira decisão de quem vai criar conta. A escolha segue para o cadastro já com o perfil
-// definido (/sign-up?role=guardian|teacher); quem já tem conta vai para o login.
+// AUT-01: primeira tela do app para quem não está logado (RF03). A escolha segue para o cadastro já
+// com o perfil definido (/sign-up?role=guardian|teacher); quem já tem conta vai para o login.
 const ROLE_OPTIONS: {
   role: UserRole;
   title: string;
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     height: 220,
     paddingHorizontal: spacing.lg,
     justifyContent: 'flex-end',
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   circle: {
     position: 'absolute',

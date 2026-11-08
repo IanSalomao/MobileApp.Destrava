@@ -1,4 +1,4 @@
-import { canAccess, type AccessState, type RouteArea } from '../route-access';
+import { canAccess, homeHref, type AccessState, type RouteArea } from '../route-access';
 
 const visitor: AccessState = { isSignedIn: false, role: undefined };
 const guardian: AccessState = { isSignedIn: true, role: 'guardian' };
@@ -27,5 +27,16 @@ describe('AUT-05: canAccess (guarda de rotas por papel)', () => {
 
     expect(canAccess('guardian', loading)).toBe(false);
     expect(canAccess('teacher', loading)).toBe(false);
+  });
+});
+
+describe('RF03: homeHref (destino de quem é barrado)', () => {
+  it.each<[string, AccessState, string]>([
+    ['visitante vai para a escolha de perfil', visitor, '/welcome'],
+    ['responsável vai para as abas', guardian, '/'],
+    ['professor vai para as abas', teacher, '/'],
+    ['logado sem papel vai para as abas', noRole, '/'],
+  ])('%s', (_label, state, expected) => {
+    expect(homeHref(state)).toBe(expected);
   });
 });
