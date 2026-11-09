@@ -148,7 +148,10 @@ begin
     insert into auth.users (
       instance_id, id, aud, role, email, encrypted_password,
       email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
-      created_at, updated_at
+      created_at, updated_at,
+      -- O Auth do Supabase (GoTrue) lê estes tokens como texto: nulos quebram o login com
+      -- "Database error querying schema". Usuários criados pelo próprio Auth nascem com ''.
+      confirmation_token, recovery_token, email_change_token_new, email_change
     ) values (
       v_instance_id,
       v_teacher_id,
@@ -166,7 +169,8 @@ begin
         'terms_version', '2026-10'
       ),
       now() - (i || ' days')::interval,
-      now()
+      now(),
+      '', '', '', ''
     ) on conflict (id) do nothing;
 
     insert into auth.identities (
@@ -366,7 +370,10 @@ begin
     insert into auth.users (
       instance_id, id, aud, role, email, encrypted_password,
       email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
-      created_at, updated_at
+      created_at, updated_at,
+      -- O Auth do Supabase (GoTrue) lê estes tokens como texto: nulos quebram o login com
+      -- "Database error querying schema". Usuários criados pelo próprio Auth nascem com ''.
+      confirmation_token, recovery_token, email_change_token_new, email_change
     ) values (
       v_instance_id,
       v_guardian_id,
@@ -385,7 +392,8 @@ begin
         'minor_data_consent', 'true'
       ),
       now() - (g || ' days')::interval,
-      now()
+      now(),
+      '', '', '', ''
     ) on conflict (id) do nothing;
 
     insert into auth.identities (

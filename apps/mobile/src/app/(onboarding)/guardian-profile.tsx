@@ -9,15 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { StepHeader } from '@/components/ui/step-header';
 import { Text } from '@/components/ui/text';
+import { GUARDIAN_HOME } from '@/features/auth/route-access';
+import { useSubjects } from '@/features/catalog/hooks';
 import { SCHOOL_GRADE_OPTIONS } from '@/features/catalog/types';
 import { useGuardianProfileForm } from '@/features/students/hooks';
-import { useSubjects } from '@/features/subjects/hooks';
 import { colors } from '@/theme';
 
 export default function GuardianProfileScreen() {
   const { data: subjects } = useSubjects();
   const { control, submit, isSubmitting, errorMessage } = useGuardianProfileForm(() =>
-    router.replace('/(tabs)'),
+    router.replace(GUARDIAN_HOME),
   );
 
   const subjectOptions = (subjects ?? []).map((subject) => ({

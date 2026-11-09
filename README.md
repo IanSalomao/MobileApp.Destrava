@@ -2,7 +2,7 @@
 
 **Conectando professores de reforço escolar a pais próximos.**
 
-> **Status:** MVP em desenvolvimento. Este repositório reúne o **aplicativo mobile** e o **backend no Supabase** do Destrava, além da documentação de planejamento ([apresentação](DESTRAVA.pdf) e [Business Model Canvas](DESTRAVA.png)). Por enquanto o app tem cadastro, login e perfil, e o banco já tem o schema de todas as funcionalidades do MVP; as telas da busca e das demais funcionalidades estão por vir.
+> **Status:** MVP em desenvolvimento. Este repositório reúne o **aplicativo mobile** e o **backend no Supabase** do Destrava, além da documentação de planejamento ([apresentação](DESTRAVA.pdf) e [Business Model Canvas](DESTRAVA.png)). O app já tem cadastro, login e o onboarding de responsáveis e professores, e o banco tem o schema de todas as funcionalidades do MVP. As demais telas já existem como rotas provisórias, com a navegação funcionando e o nome de quem vai desenvolver cada uma (veja [Divisão das telas do MVP](#divisão-das-telas-do-mvp)).
 
 ## O que é
 
@@ -149,7 +149,7 @@ O Destrava roda em nuvem, sobre o Supabase:
 
 ## Desenvolvimento
 
-O repositório é um monorepo com npm workspaces: o app e o projeto Supabase (migrações, configuração e Edge Functions) são versionados juntos.
+O repositório é um monorepo com npm workspaces: o app e o projeto Supabase (migrações, configuração e Edge Functions) são versionados juntos. O que cada pasta faz está em [Organização do projeto](#organização-do-projeto).
 
 ```
 apps/mobile/   # app Expo (React Native + TypeScript)
@@ -251,10 +251,247 @@ npm run db:push
 
 No `.env` do app, use a URL e a chave publishable do projeto remoto. Lá a confirmação de e-mail vem ligada por padrão; o app já avisa o usuário para confirmar antes de entrar.
 
+## Organização do projeto
+
+### Pastas da raiz
+
+| Pasta         | Para que serve                                                                                                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/mobile` | O app Expo (workspace `@destrava/mobile`). Todo o código fica em `src/`; `assets/` guarda ícones e imagens.                                                                                                                           |
+| `supabase`    | O backend versionado: `migrations/` (schema, uma migração por domínio), `tests/database/` (testes pgTAP de RLS e regras), `functions/` (Edge Functions, ainda vazia), `seed.sql` (dados fictícios e contas de teste) e `config.toml`. |
+| `docs`        | Decisões registradas pelo grupo (ex.: `decisao-pagamento-simulado.md`) e os textos legais em `legal/`.                                                                                                                                |
+| `site`        | Páginas públicas estáticas (landing, Termos e Política), geradas de `docs/legal` por `build.py`.                                                                                                                                      |
+| `.github`     | CI (`workflows/ci.yml`: formatação, lint, tipos e testes com cobertura) e o modelo de PR com a Definition of Done.                                                                                                                    |
+| `.husky`      | Hook de pre-commit: lint dos arquivos alterados e checagem de tipos.                                                                                                                                                                  |
+
+### O app (`apps/mobile/src`)
+
+O app segue **MVVM com organização por feature**: cada domínio do negócio é uma pasta em `features/`, com seus dados, regras, estado e componentes; as rotas em `app/` só montam a tela com o que as features entregam.
+
+```
+src/
+  app/                  # rotas do Expo Router (Views): só compõem a tela
+  features/<feature>/   # um domínio do negócio: dados, regras, estado e componentes próprios
+  components/ui/        # design system: Button, Text, TextField, Screen, TeacherCard, Banner...
+  components/form/      # campos do components/ui ligados ao react-hook-form
+  components/scaffold/  # PROVISÓRIO: tela das rotas que ainda não foram desenvolvidas
+  lib/                  # infraestrutura sem regra de negócio: Supabase, Storage, seletor de arquivos, máscaras
+  theme/                # tokens de cor, espaçamento, raio e tipografia
+```
+
+| Camada    | Onde fica                                   | O que faz                                                                                     | O que não faz                                                          |
+| --------- | ------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Model     | `features/<feature>/api.ts`                 | Chama o Supabase, lança o erro dele (`if (error) throw error`) e devolve dados tipados.       | Tratar erro ou saber de tela.                                          |
+| ViewModel | `features/<feature>/hooks.ts`               | `useQuery`/`useMutation`, formulário, tradução de erro e estado derivado da tela.             | Importar o cliente Supabase (o ESLint barra fora de `api.ts`).         |
+| View      | `app/**` e `features/<feature>/components/` | Renderiza o que o hook entrega, com os componentes de `components/ui` e os tokens de `theme`. | Chamar o banco, ter regra de negócio ou usar cor e espaçamento soltos. |
+
+As dependências vão sempre num sentido: `app/` usa `features/`, que usam `components/`, `lib/` e `theme/`. Uma feature pode importar de outra; nada importa de `app/`.
+
+### Rotas e navegação
+
+As rotas ficam em `src/app/`, agrupadas por quem pode abri-las. Os grupos (pastas entre parênteses) não aparecem na URL.
+
+| Grupo          | Quem abre               | O que tem                                                                                                             |
+| -------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `(auth)`       | Só quem está deslogado  | Escolha de perfil (`/welcome`, a primeira tela do app), cadastro, login e "esqueci minha senha".                      |
+| `(legal)`      | Todos                   | Termos de Uso e Política de Privacidade.                                                                              |
+| `(onboarding)` | Logado                  | Etapas logo depois do cadastro (perfil do responsável, assinatura e cadastro profissional) e a escolha de papel.      |
+| `(guardian)`   | Responsável             | Abas em `(tabs)`: Início (`/`), Solicitações e Perfil. As outras telas do responsável abrem por cima das abas.        |
+| `(teacher)`    | Professor               | Abas em `(tabs)`: Início (`/dashboard`), Solicitações e Perfil. As outras telas do professor abrem por cima das abas. |
+| `(shared)`     | Logado, nos dois papéis | Telas comuns: notificações, configurações e avaliações de um professor.                                               |
+
+- **As guardas ficam num lugar só:** `app/_layout.tsx` (com `Stack.Protected`), usando as regras de `features/auth/route-access.ts`. Quem abre uma área que não é a sua vai para o início do próprio papel (`homeHref`). Uma rota nova entra no grupo certo e herda a guarda; não crie guarda dentro da tela.
+- **Toda tela se registra** no `_layout.tsx` do seu grupo, com o título do header.
+- **A URL precisa ser única no app inteiro**, já que o grupo não aparece nela. Nome de rota em inglês e em kebab-case; tela de um item usa parâmetro (`teachers/[id].tsx`).
+- **Navegação:** `router.push` para avançar, `router.replace` para sair de um fluxo sem deixar volta, `router.dismissTo(href)` para voltar a uma tela que já está na pilha e `router.dismissAll()` para voltar às abas.
+- **Rotas tipadas:** o Expo gera os tipos das rotas quando o servidor sobe. Depois de criar uma rota, rode `npm run mobile` uma vez antes do `npm run typecheck` (o pre-commit também checa os tipos).
+
+### Anatomia de uma feature
+
+Crie só os arquivos de que a feature precisa:
+
+```
+features/contact-requests/
+  api.ts          # Model: a única porta para o Supabase
+  hooks.ts        # ViewModels e chaves de query (contactRequestKeys)
+  schemas.ts      # validação zod dos formulários
+  types.ts        # tipos derivados de database.types.ts e rótulos em pt-BR
+  errors.ts       # tradução dos códigos de erro do banco (raise exception) para mensagens
+  domain/         # regras puras, sem React e sem Supabase (ex.: canAccept, canCancel)
+  components/     # componentes usados só por esta feature
+  *.test.ts(x)    # testes ao lado do arquivo testado
+```
+
+| Feature            | Domínio                                                           | Situação                          |
+| ------------------ | ----------------------------------------------------------------- | --------------------------------- |
+| `auth`             | Cadastro, login, sessão, guarda de rotas e aceite de termos       | Pronta (falta o login com Google) |
+| `profile`          | Perfil do usuário logado (`profiles`)                             | Leitura pronta                    |
+| `catalog`          | Matérias, idiomas, municípios e rótulos dos enums                 | Pronta                            |
+| `students`         | Alunos (filhos) do responsável                                    | Cadastro do onboarding            |
+| `teachers`         | Perfil do professor: cadastro, edição e leitura do perfil público | Cadastro do onboarding            |
+| `subscriptions`    | Assinatura e cartão (simulados)                                   | Início da assinatura              |
+| `contact-requests` | Solicitações de contato e botão do WhatsApp                       | Regras puras em `domain/`         |
+| `teacher-search`   | Busca e filtros (`search_teachers`)                               | A criar                           |
+| `reviews`          | Avaliações                                                        | A criar                           |
+| `favorites`        | Professores favoritos                                             | A criar                           |
+| `notifications`    | Notificações                                                      | A criar                           |
+| `settings`         | Limpeza de cache e preferências                                   | A criar                           |
+
+### Onde colocar cada coisa
+
+| Preciso de...                                              | Onde colocar                                                                                       |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Uma tela nova                                              | `app/<grupo>/<rota>.tsx`, registrada no `_layout.tsx` do grupo. A tela só usa hooks e componentes. |
+| Ler ou gravar dados                                        | Uma função em `features/<feature>/api.ts` e o hook dela em `hooks.ts`.                             |
+| Uma regra de acesso ou de negócio que precisa valer        | No banco (RLS, trigger ou função), por migração. O app só reflete o que o banco permite.           |
+| Uma regra pura usada por mais de uma tela                  | `features/<feature>/domain/`, com teste.                                                           |
+| Validar um formulário                                      | `features/<feature>/schemas.ts` (zod).                                                             |
+| Um componente usado por uma feature só                     | `features/<feature>/components/`.                                                                  |
+| Um componente usado por duas ou mais features              | `components/ui/`, apresentacional (recebe dados por props, sem hook de feature).                   |
+| Um campo de formulário reaproveitável                      | `components/form/`.                                                                                |
+| Um utilitário sem regra de negócio (máscara, upload, link) | `lib/`.                                                                                            |
+| Uma cor, espaçamento ou estilo de texto                    | Um token em `theme/tokens.ts`.                                                                     |
+| O rótulo em pt-BR de um enum do banco                      | `features/catalog/types.ts`.                                                                       |
+
+### Como o projeto deve crescer
+
+- **Comece dentro da feature e promova quando repetir.** Um componente nasce em `features/<feature>/components/` e vai para `components/ui/` quando outra feature precisar dele; um utilitário vai para `lib/` pelo mesmo critério.
+- **Feature grande vira duas features, não subpastas de `api/`.** O ESLint só libera o cliente Supabase em arquivos chamados `api.ts`. Quando uma feature juntar assuntos diferentes, separe por domínio, como a busca (`teacher-search`) separada do perfil do professor (`teachers`).
+- **Sem camadas de reexportação nem pastas genéricas** (`shared/`, `utils/`, `helpers/`): importe direto do arquivo, com o alias `@/`. Se duas features precisam da mesma coisa, ela desce para `components/ui`, `lib/` ou `theme/`.
+- **Testes ao lado do arquivo** (`api.test.ts`, `button.test.tsx`). A pasta `__tests__/` fica para testes que cruzam vários arquivos, como os de navegação em `features/auth/__tests__`. Ao cobrir o `api.ts` e o `hooks.ts` de uma feature, inclua os dois no `collectCoverageFrom` e no `coverageThreshold` do `jest.config.js`.
+- **Schema muda só por migração** (veja [Mudando o banco](#mudando-o-banco)), com RLS na mesma migração e os tipos regenerados junto.
+- **Quando a última tela provisória for desenvolvida**, apague `components/scaffold/`.
+
+## Divisão das telas do MVP
+
+Cada pessoa ficou com uma fatia vertical: as telas de um fluxo e as features que elas usam (api, hooks e componentes). Assim cada um trabalha em pastas diferentes e os conflitos de merge ficam raros. São 24 telas: a busca tem 4, por concentrar a lógica mais pesada (RPC, paginação, filtros compartilhados entre telas e o limite de 2 s do RNF01); as outras fatias têm 5.
+
+As rotas já existem. Cada uma mostra no centro o nome do responsável e, embaixo, botões para as telas seguintes do fluxo, para dar para navegar pelo app inteiro desde já. Para começar a sua tela, troque o conteúdo do arquivo da rota pela tela de verdade, mantendo a rota e a navegação. A coluna "Protótipo" é o nome da tela exportada do Figma.
+
+```mermaid
+flowchart TD
+    subgraph R[Responsável]
+        home["Início /<br/>Anna"]
+        search["Resultado da busca<br/>Anna"]
+        filters["Filtros<br/>Anna"]
+        location["Onde buscar<br/>Anna"]
+        teacher["Perfil do professor<br/>Fátima"]
+        write["Avaliar professor<br/>Fátima"]
+        account["Meu perfil<br/>Fátima"]
+        fav["Favoritos<br/>Fátima"]
+        contact["Solicitar contato<br/>Rebeca"]
+        sent["Solicitação enviada<br/>Rebeca"]
+        myreq["Minhas solicitações<br/>Rebeca"]
+        detail["Detalhe do pedido<br/>Rebeca"]
+        student["Aluno<br/>Rebeca"]
+    end
+    subgraph P[Professor]
+        dash["Início /dashboard<br/>Valeria"]
+        recv["Solicitações recebidas<br/>Valeria"]
+        rdetail["Detalhe da solicitação<br/>Valeria"]
+        taccount["Meu perfil<br/>Ian"]
+        edit["Editar perfil<br/>Ian"]
+        sub["Minha assinatura<br/>Ian"]
+        card["Cartão de crédito<br/>Ian"]
+    end
+    subgraph C[Comuns aos dois papéis]
+        notif["Notificações<br/>Valeria"]
+        settings["Configurações<br/>Valeria"]
+        reviews["Avaliações<br/>Fátima"]
+    end
+    home --> search & filters & location
+    search --> teacher
+    teacher --> contact --> sent --> myreq --> detail
+    teacher --> reviews
+    detail --> write
+    account --> student & fav & settings
+    fav --> teacher
+    dash --> recv --> rdetail
+    taccount --> edit & sub & reviews & settings
+    sub --> card
+    home & dash --> notif
+```
+
+### Anna Beatriz Lima: busca de professores (RF04, RF05, RNF01)
+
+| Tela                  | Rota               | Arquivo em `apps/mobile/src/app/` | Protótipo           |
+| --------------------- | ------------------ | --------------------------------- | ------------------- |
+| Início do responsável | `/`                | `(guardian)/(tabs)/index.tsx`     | HOME E BUSCA        |
+| Resultado da busca    | `/search`          | `(guardian)/search.tsx`           | RESULTADO DO FILTRO |
+| Filtros (modal)       | `/search-filters`  | `(guardian)/search-filters.tsx`   | FILTRO              |
+| Onde buscar (modal)   | `/search-location` | `(guardian)/search-location.tsx`  | "Alterar" da home   |
+
+Features: `teacher-search` (nova: RPC `search_teachers`, paginação e o estado dos filtros compartilhado entre as três telas) e `catalog` (matérias, idiomas e municípios). Reaproveite `TeacherCard` e `SubjectsList`. O responsável não tem cidade no banco: guardar a escolha no aparelho ou criar a coluna por migração é uma decisão a combinar com o grupo.
+
+### Fátima Pinho: perfil do professor, avaliações, favoritos e perfil do responsável (RF03, RF06, RF09–RF12)
+
+| Tela                     | Rota                        | Arquivo em `apps/mobile/src/app/`         | Protótipo                                               |
+| ------------------------ | --------------------------- | ----------------------------------------- | ------------------------------------------------------- |
+| Perfil do professor      | `/teachers/[id]`            | `(guardian)/teachers/[id].tsx`            | DETALHES PROFESSOR, ANTES DE ACEITAR, DEPOIS DE ACEITAR |
+| Avaliações do professor  | `/reviews/[teacherId]`      | `(shared)/reviews/[teacherId].tsx`        | "Ver todas" do perfil                                   |
+| Avaliar professor        | `/write-review/[teacherId]` | `(guardian)/write-review/[teacherId].tsx` | AVALIAÇÃO                                               |
+| Favoritos                | `/favorites`                | `(guardian)/favorites.tsx`                | Segue o card da busca                                   |
+| Meu perfil (responsável) | `/account`                  | `(guardian)/(tabs)/account.tsx`           | PERFIL RESPONSAVEL                                      |
+
+Features: `teachers` (leitura do perfil público), `reviews`, `favorites` (inclui o botão de coração que a Anna usa nos cards) e `profile`. Pode reaproveitar `ProfileCard` e `AvatarPicker`.
+
+### Rebeca Batista: solicitações do responsável e alunos (RF07, RF09, RF10, RF14)
+
+| Tela                      | Rota                              | Arquivo em `apps/mobile/src/app/`            | Protótipo                                     |
+| ------------------------- | --------------------------------- | -------------------------------------------- | --------------------------------------------- |
+| Solicitar contato         | `/contact-request/[teacherId]`    | `(guardian)/contact-request/[teacherId].tsx` | FORMULARIO SOLICIAR CONTATO                   |
+| Solicitação enviada       | `/contact-request-sent`           | `(guardian)/contact-request-sent.tsx`        | FORMULARIO ENVIADO                            |
+| Minhas solicitações       | `/my-requests`                    | `(guardian)/(tabs)/my-requests.tsx`          | TODOS OS CHATS (vira a lista de solicitações) |
+| Detalhe do pedido         | `/my-requests/[id]`               | `(guardian)/my-requests/[id].tsx`            | DETALHES DA SOLICITACAO (ACEITA e RECUSADA)   |
+| Aluno (cadastro e edição) | `/students/[id]` (`new` cadastra) | `(guardian)/students/[id].tsx`               | Card "Aluno" do PERFIL RESPONSAVEL            |
+
+Features: `contact-requests` (lado do responsável: criar, listar, cancelar e pedir de novo, mais o botão "Conversar no WhatsApp" do RF10) e `students`. As regras puras de status já estão em `contact-requests/domain/`.
+
+### Valeria Soares: área do professor, notificações e configurações (RF08, RF09, RF10, RF15, RNF10)
+
+| Tela                   | Rota                      | Arquivo em `apps/mobile/src/app/`        | Protótipo                                   |
+| ---------------------- | ------------------------- | ---------------------------------------- | ------------------------------------------- |
+| Início do professor    | `/dashboard`              | `(teacher)/(tabs)/dashboard.tsx`         | AREA DO PROFESSOR - HOME                    |
+| Solicitações recebidas | `/received-requests`      | `(teacher)/(tabs)/received-requests.tsx` | Lista do RF15                               |
+| Detalhe da solicitação | `/received-requests/[id]` | `(teacher)/received-requests/[id].tsx`   | DETALHES DA SOLICITACAO (ACEITA e RECUSADA) |
+| Notificações           | `/notifications`          | `(shared)/notifications.tsx`             | O sino das duas homes                       |
+| Configurações          | `/settings`               | `(shared)/settings.tsx`                  | Limpar cache, termos e sair                 |
+
+Features: `contact-requests` (lado do professor: listar, aceitar e recusar), `notifications` e `settings` (limpeza do cache local, RNF10).
+
+### Ian Salomão: conta do professor, assinatura e login com Google (RF01, RF11, RF13, RNF06)
+
+| Tela                       | Rota                 | Arquivo em `apps/mobile/src/app/`      | Protótipo                            |
+| -------------------------- | -------------------- | -------------------------------------- | ------------------------------------ |
+| Meu perfil (professor)     | `/teacher-account`   | `(teacher)/(tabs)/teacher-account.tsx` | Prévia do perfil público e menu      |
+| Editar perfil profissional | `/edit-profile`      | `(teacher)/edit-profile.tsx`           | CADASTRO PROFISSIONAL (etapas 1 a 3) |
+| Minha assinatura           | `/subscription`      | `(teacher)/subscription/index.tsx`     | ASSINATURA E PAGAMENTO               |
+| Cartão de crédito          | `/subscription/card` | `(teacher)/subscription/card.tsx`      | ASSINATURA E PAGAMENTO               |
+| Escolha de papel (Google)  | `/choose-role`       | `(onboarding)/choose-role.tsx`         | ESCOLHA DE PERFIL                    |
+
+Features: `teachers` (edição do perfil e links de rede social), `subscriptions` e `auth` (login com Google). A edição reaproveita o formulário de `(onboarding)/teacher-professional` e o cartão, o de `(onboarding)/teacher-subscription`. O layout raiz já manda para `/choose-role` todo usuário logado sem papel, que é o caso de quem entra com o Google.
+
+### Pontos de contato entre as fatias
+
+- **`contact-requests` é dividida entre Rebeca (responsável) e Valeria (professor).** Rebeca cria primeiro o `types.ts` e o botão do WhatsApp; Valeria reaproveita. Cada uma acrescenta as próprias funções no mesmo `api.ts` e `hooks.ts`, em PRs pequenos.
+- **`teachers` é compartilhada entre Fátima (leitura do perfil público) e Ian (edição).** O cadastro do onboarding já está lá.
+- **O coração de favorito** é da Fátima (`favorites`); a Anna usa nos cards da busca.
+- **Telas que levam à tela de outra pessoa** (busca → perfil do professor → solicitar contato) já navegam pela rota certa. O id do professor nas rotas é `teachers.id`, que é o mesmo id do usuário.
+- **Mudanças no que é de todos** (`_layout.tsx`, guardas, `components/ui`, `theme`, migrações) vão em PR próprio, revisado por quem é afetado. Não edite a tela de outra pessoa sem combinar.
+
+### Fluxo de trabalho
+
+1. Uma branch por tela ou feature, saindo da `main`: `feat/<código-da-task>-<descrição>` (como `feat/AUT-05-sessao-e-guarda-de-rotas`).
+2. Para testar, entre com as contas do `supabase/seed.sql` (listadas no topo do arquivo): há responsável e professor prontos.
+3. Antes de abrir o PR: `npm run lint`, `npm run typecheck`, `npm run format:check` e `npm test`, que é o que a CI roda.
+4. PR pequeno, com o modelo preenchido (Definition of Done) e os requisitos citados pelo código (ex.: RF14).
+
 ## Documentação
 
 - [DESTRAVA.pdf](DESTRAVA.pdf): apresentação do projeto (ideia, requisitos, arquitetura, stack e padrões).
 - [DESTRAVA.png](DESTRAVA.png): Business Model Canvas.
+- [docs/decisao-pagamento-simulado.md](docs/decisao-pagamento-simulado.md): por que a cobrança da assinatura é simulada no MVP.
+- [docs/legal/](docs/legal/): Termos de Uso e Política de Privacidade.
 
 ## Equipe
 

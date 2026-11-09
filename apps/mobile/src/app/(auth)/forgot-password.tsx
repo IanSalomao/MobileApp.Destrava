@@ -6,7 +6,7 @@ import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import type { AuthRepository } from '@/features/auth/api';
 import { useForgotPasswordForm } from '@/features/auth/hooks';
-import { Banner } from '@/shared/ui/components';
+import { Banner } from '@/components/ui/banner';
 
 export type ForgotPasswordScreenProps = {
   repository?: AuthRepository;

@@ -1,15 +1,25 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 
-import { listCities, listLanguages } from './api';
+import { listCities, listLanguages, listSubjects } from './api';
 import type { BrazilianState } from './types';
 
 // O catálogo muda raramente (só por migração), então fica em cache por bastante tempo.
 const CATALOG_STALE_TIME = 1000 * 60 * 60; // 1 h
 
 export const catalogKeys = {
+  subjects: ['catalog', 'subjects'] as const,
   languages: ['catalog', 'languages'] as const,
   cities: (state: BrazilianState | null) => ['catalog', 'cities', state] as const,
 };
+
+/** Lista de matérias do catálogo. */
+export function useSubjects() {
+  return useQuery({
+    queryKey: catalogKeys.subjects,
+    queryFn: listSubjects,
+    staleTime: CATALOG_STALE_TIME,
+  });
+}
 
 /** Lista de idiomas do catálogo. */
 export function useLanguages() {

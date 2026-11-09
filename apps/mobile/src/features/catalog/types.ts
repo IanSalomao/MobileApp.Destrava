@@ -1,5 +1,8 @@
 import { Constants, type Enums, type Tables } from '@/lib/database.types';
 
+// Matéria do catálogo (ex.: "Matemática"). Dado de referência, só leitura; entra por migração.
+export type Subject = Pick<Tables<'subjects'>, 'id' | 'name'>;
+
 // Idioma do catálogo (ex.: "Inglês"). Dado de referência, só leitura; entra por migração.
 export type Language = Pick<Tables<'languages'>, 'id' | 'name'>;
 

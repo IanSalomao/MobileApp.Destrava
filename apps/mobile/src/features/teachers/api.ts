@@ -1,9 +1,8 @@
 import type { Enums } from '@/lib/database.types';
+import { extensionForContentType, type PickedFile } from '@/lib/file-picker';
 import { onlyDigits } from '@/lib/masks';
 import { uploadToBucket } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
-
-import { extensionForContentType, type PickedFile } from './types';
 
 // Model/repositório da feature: único lugar que fala com o Supabase. Grava o cadastro profissional
 // (perfil, verificação, matérias, idiomas, documentos) e envia para análise. Deixa o erro subir;

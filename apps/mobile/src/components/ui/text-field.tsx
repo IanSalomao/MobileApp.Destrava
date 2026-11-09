@@ -27,8 +27,6 @@ export type TextFieldProps = TextInputProps & {
   ref?: Ref<TextInputInstance>;
 };
 
-export type InputProps = TextFieldProps;
-
 export function TextField({
   label,
   error,
@@ -102,8 +100,6 @@ export function TextField({
     </View>
   );
 }
-
-export const Input = TextField;
 
 const MIN_TOUCH = layout?.minTouchTarget ?? 44;
 

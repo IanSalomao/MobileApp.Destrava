@@ -8,17 +8,17 @@ import { FormSelectField } from '@/components/form/form-select-field';
 import { FormTextField } from '@/components/form/form-text-field';
 import { FormWeekdayPicker } from '@/components/form/form-weekday-picker';
 import { AvatarPicker } from '@/components/ui/avatar-picker';
+import { Banner } from '@/components/ui/banner';
 import { Button } from '@/components/ui/button';
 import { FilePickerField } from '@/components/ui/file-picker-field';
 import { Screen } from '@/components/ui/screen';
 import { StepHeader } from '@/components/ui/step-header';
 import { Text } from '@/components/ui/text';
+import { TEACHER_HOME } from '@/features/auth/route-access';
+import { useLanguages, useSubjects } from '@/features/catalog/hooks';
 import { BRAZILIAN_STATE_OPTIONS, DAY_PERIODS, DAY_PERIOD_LABELS } from '@/features/catalog/types';
-import { useLanguages } from '@/features/catalog/hooks';
 import { useTeacherProfileForm } from '@/features/teachers/hooks';
-import { useSubjects } from '@/features/subjects/hooks';
 import { maskCpf, maskCurrencyBRL } from '@/lib/masks';
-import { Banner } from '@/shared/ui/components';
 import { colors, spacing } from '@/theme';
 
 const TUTORING_OPTIONS = [
@@ -46,7 +46,7 @@ const STEP_COPY: Record<number, { title: string; subtitle: string }> = {
 export default function TeacherProfessionalScreen() {
   const { data: subjects } = useSubjects();
   const { data: languages } = useLanguages();
-  const vm = useTeacherProfileForm(() => router.replace('/(tabs)'));
+  const vm = useTeacherProfileForm(() => router.replace(TEACHER_HOME));
 
   const subjectOptions = (subjects ?? []).map((subject) => ({
     value: subject.id,

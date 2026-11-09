@@ -23,8 +23,8 @@ module.exports = {
   collectCoverageFrom: [
     'src/features/auth/route-access.ts',
     'src/features/contact-requests/domain/contact-request.ts',
-    'src/features/subjects/api.ts',
-    'src/features/subjects/hooks.ts',
+    'src/features/catalog/api.ts',
+    'src/features/catalog/hooks.ts',
   ],
   // Gate: a lógica das features COM teste precisa de >= 80%. Ao cobrir uma
   // feature nova, adicione o api.ts e o hooks.ts dela em collectCoverageFrom e
@@ -42,13 +42,13 @@ module.exports = {
       lines: 100,
       statements: 100,
     },
-    './src/features/subjects/api.ts': {
+    './src/features/catalog/api.ts': {
       branches: 80,
       functions: 80,
       lines: 80,
       statements: 80,
     },
-    './src/features/subjects/hooks.ts': {
+    './src/features/catalog/hooks.ts': {
       branches: 80,
       functions: 80,
       lines: 80,

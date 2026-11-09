@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
+import { TEACHER_HOME } from '@/features/auth/route-access';
 import { colors, radius, spacing } from '@/theme';
 
 // No MVP o pagamento é sempre aprovado (cobrança simulada, RF13).
@@ -53,7 +54,11 @@ export default function TeacherPaymentApprovedScreen() {
         onPress={() => router.replace('/teacher-professional')}
         leftIcon={<Ionicons name="arrow-forward" size={18} color={colors.onPrimary} />}
       />
-      <Button title="Fazer isso depois" variant="ghost" onPress={() => router.replace('/(tabs)')} />
+      <Button
+        title="Fazer isso depois"
+        variant="ghost"
+        onPress={() => router.replace(TEACHER_HOME)}
+      />
     </Screen>
   );
 }

@@ -6,13 +6,12 @@ import { useForm, useWatch } from 'react-hook-form';
 import { useSession } from '@/features/auth/session-provider';
 import { useCities } from '@/features/catalog/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
+import { pickDocument, pickImage, type PickedFile } from '@/lib/file-picker';
 import { currencyToCents } from '@/lib/masks';
 
 import { saveAndSubmitTeacherProfile } from './api';
 import { getTeacherErrorMessage } from './errors';
-import { pickDocument, pickImage } from './pick';
 import { teacherProfileSchema, TEACHER_STEP_FIELDS, type TeacherProfileInput } from './schemas';
-import type { PickedFile } from './types';
 
 const TOTAL_STEPS = 3;
 

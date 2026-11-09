@@ -33,9 +33,9 @@ describe('AUT-05: canAccess (guarda de rotas por papel)', () => {
 describe('RF03: homeHref (destino de quem é barrado)', () => {
   it.each<[string, AccessState, string]>([
     ['visitante vai para a escolha de perfil', visitor, '/welcome'],
-    ['responsável vai para as abas', guardian, '/'],
-    ['professor vai para as abas', teacher, '/'],
-    ['logado sem papel vai para as abas', noRole, '/'],
+    ['responsável vai para o início da área do responsável', guardian, '/'],
+    ['professor vai para o início da área do professor', teacher, '/dashboard'],
+    ['logado sem papel (Google, RNF06) vai para a escolha de papel', noRole, '/choose-role'],
   ])('%s', (_label, state, expected) => {
     expect(homeHref(state)).toBe(expected);
   });
