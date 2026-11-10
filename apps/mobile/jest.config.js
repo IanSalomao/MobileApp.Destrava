@@ -23,6 +23,8 @@ module.exports = {
   collectCoverageFrom: [
     'src/features/auth/route-access.ts',
     'src/features/contact-requests/domain/contact-request.ts',
+    'src/features/contact-requests/api.ts',
+    'src/features/contact-requests/hooks.ts',
     'src/features/catalog/api.ts',
     'src/features/catalog/hooks.ts',
   ],
@@ -41,6 +43,18 @@ module.exports = {
       functions: 100,
       lines: 100,
       statements: 100,
+    },
+    './src/features/contact-requests/api.ts': {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+    './src/features/contact-requests/hooks.ts': {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
     './src/features/catalog/api.ts': {
       branches: 80,
