@@ -35,6 +35,15 @@ type ReceivedContactRequestRow = Pick<
   | 'expires_at'
 >;
 
+export type ReceivedContactRequestDetail = ReceivedContactRequest &
+  Readonly<{
+    guardianId: string;
+    teacherId: string;
+    studentAge: number | null;
+  }>;
+
+export type AnswerContactRequestStatus = 'accepted' | 'declined';
+
 type GuardianProfile = Pick<Tables<'profiles'>, 'id' | 'full_name' | 'avatar_url'>;
 
 function isRowExpired(row: ContactRequestRow, teacherId: string): boolean {
@@ -172,4 +181,60 @@ export async function listReceivedContactRequests(
 
   const guardians = await loadGuardians(data);
   return data.map((row) => toReceivedContactRequest(row, guardians));
+}
+
+export async function getReceivedContactRequest(
+  teacherId: string,
+  requestId: string,
+): Promise<ReceivedContactRequestDetail> {
+  const { data, error } = await supabase
+    .from('contact_requests')
+    .select(
+      'id, teacher_id, guardian_id, guardian_name, student_name, student_school_grade, student_age, reason, preferred_tutoring_type, status, created_at, responded_at, expires_at',
+    )
+    .eq('id', requestId)
+    .eq('teacher_id', teacherId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error('contact_request_not_found');
+
+  const guardians = await loadGuardians([data]);
+  const summary = toReceivedContactRequest(data, guardians);
+
+  return {
+    ...summary,
+    guardianId: data.guardian_id,
+    teacherId: data.teacher_id,
+    studentAge: data.student_age,
+  };
+}
+
+export async function getGuardianContactDetails(guardianId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('contact_details')
+    .select('phone')
+    .eq('user_id', guardianId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data?.phone ?? null;
+}
+
+export async function answerContactRequest(
+  teacherId: string,
+  requestId: string,
+  status: AnswerContactRequestStatus,
+): Promise<void> {
+  const { data, error } = await supabase
+    .from('contact_requests')
+    .update({ status })
+    .eq('id', requestId)
+    .eq('teacher_id', teacherId)
+    .eq('status', 'pending')
+    .select('id')
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error('contact_request_already_answered');
 }
