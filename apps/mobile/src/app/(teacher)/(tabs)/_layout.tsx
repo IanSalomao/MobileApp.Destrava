@@ -11,6 +11,7 @@ export default function TeacherTabsLayout() {
         name="dashboard"
         options={{
           title: 'Início',
+          headerShown: false,
           tabBarIcon: ({ focused, size }) => (
             <TabBarIcon name="home-outline" focused={focused} size={size} />
           ),
