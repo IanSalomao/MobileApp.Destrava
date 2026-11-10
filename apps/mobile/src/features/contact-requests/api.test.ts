@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
-import { getTeacherDashboard } from './api';
+import { getTeacherDashboard, listReceivedContactRequests } from './api';
 
 jest.mock('@/lib/supabase', () => ({
   supabase: { from: jest.fn() },
@@ -274,5 +274,119 @@ describe('getTeacherDashboard', () => {
     });
 
     await expect(getTeacherDashboard(TEACHER_ID)).rejects.toBe(error);
+  });
+});
+
+type ReceivedMockRow = MockRow & {
+  reason: string;
+  preferred_tutoring_type: string | null;
+};
+
+const RECEIVED_ROWS: ReceivedMockRow[] = [
+  {
+    ...ROWS[3],
+    reason: 'Precisamos de reforço em Matemática às terças e quintas à tarde.',
+    preferred_tutoring_type: 'in_person',
+  },
+  {
+    ...ROWS[2],
+    reason: 'O Lucas precisa de acompanhamento nas tarefas de casa de matemática.',
+    preferred_tutoring_type: 'online',
+  },
+  {
+    ...ROWS[0],
+    reason: 'A Lívia precisa de ajuda em cinemática e funções.',
+    preferred_tutoring_type: 'online',
+  },
+];
+
+function mockReceived(
+  rows: ReceivedMockRow[] = RECEIVED_ROWS,
+  profiles: unknown = PROFILES,
+  profilesError: unknown = null,
+) {
+  const requestsMock = requestsBuilder(rows);
+  const profilesMock = profilesBuilder(profiles, profilesError);
+
+  mockFrom.mockImplementation((table: string) => {
+    if (table === 'contact_requests') return requestsMock;
+    if (table === 'profiles') return profilesMock;
+    throw new Error(`tabela inesperada: ${table}`);
+  });
+
+  return { requestsMock, profilesMock };
+}
+
+describe('listReceivedContactRequests', () => {
+  afterEach(() => jest.clearAllMocks());
+
+  it('mapeia os pedidos com responsável, aluno, motivo e modalidade', async () => {
+    const { requestsMock, profilesMock } = mockReceived();
+
+    const requests = await listReceivedContactRequests(TEACHER_ID);
+
+    expect(mockFrom).toHaveBeenCalledWith('contact_requests');
+    expect(requestsMock.eq).toHaveBeenCalledWith('teacher_id', TEACHER_ID);
+    expect(requestsMock.order).toHaveBeenCalledWith('created_at', { ascending: false });
+    expect(profilesMock.in).toHaveBeenCalledWith('id', ['g1', 'g2', 'g4']);
+
+    expect(requests).toHaveLength(3);
+    expect(requests[0]).toMatchObject({
+      id: 'r1-accepted',
+      status: 'accepted',
+      guardianName: 'Juliana Martins',
+      guardianAvatarUrl: 'https://cdn.destrava.com/juliana.jpg',
+      studentName: 'Gabriel Martins',
+      schoolGrade: 'elementary_7',
+      reason: 'Precisamos de reforço em Matemática às terças e quintas à tarde.',
+      preferredTutoringType: 'in_person',
+    });
+    expect(requests[0].createdAt).toBeInstanceOf(Date);
+    expect(requests[0].respondedAt).toBeInstanceOf(Date);
+    expect(requests[0].expiresAt).toBeInstanceOf(Date);
+  });
+
+  it('usa o nome e o avatar do formulário quando o perfil do responsável não vem', async () => {
+    mockReceived(RECEIVED_ROWS, []);
+
+    const requests = await listReceivedContactRequests(TEACHER_ID);
+
+    expect(requests[1]).toMatchObject({
+      guardianName: 'Carlos Eduardo Silva',
+      guardianAvatarUrl: null,
+    });
+  });
+
+  it('não busca perfis quando não há pedidos e devolve lista vazia', async () => {
+    mockReceived([]);
+
+    const requests = await listReceivedContactRequests(TEACHER_ID);
+
+    expect(requests).toEqual([]);
+    expect(mockFrom).not.toHaveBeenCalledWith('profiles');
+  });
+
+  it('propaga o erro da consulta de pedidos', async () => {
+    const error = new Error('falha em contact_requests');
+    const requestsMock = requestsBuilder(null, error);
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'contact_requests') return requestsMock;
+      throw new Error(`tabela inesperada: ${table}`);
+    });
+
+    await expect(listReceivedContactRequests(TEACHER_ID)).rejects.toBe(error);
+  });
+
+  it('propaga o erro da consulta dos perfis', async () => {
+    const error = new Error('falha em profiles');
+    const requestsMock = requestsBuilder(RECEIVED_ROWS);
+    const profilesMock = profilesBuilder(null, error);
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'contact_requests') return requestsMock;
+      if (table === 'profiles') return profilesMock;
+      throw new Error(`tabela inesperada: ${table}`);
+    });
+
+    await expect(listReceivedContactRequests(TEACHER_ID)).rejects.toBe(error);
   });
 });
