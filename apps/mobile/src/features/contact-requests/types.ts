@@ -22,3 +22,19 @@ export type TeacherDashboardData = Readonly<{
   recentContacts: ContactSummary[];
   recentRequests: ContactSummary[];
 }>;
+
+export type ReceivedContactRequest = Readonly<{
+  id: string;
+  status: ContactRequestStatus;
+  guardianName: string;
+  guardianAvatarUrl: string | null;
+  studentName: string;
+  schoolGrade: Enums<'school_grade'>;
+  reason: string;
+  preferredTutoringType: Enums<'tutoring_type'> | null;
+  createdAt: Date;
+  respondedAt: Date | null;
+  expiresAt: Date;
+}>;
+
+export type ReceivedRequestFilter = 'pending' | 'accepted' | 'declined' | 'expired';
