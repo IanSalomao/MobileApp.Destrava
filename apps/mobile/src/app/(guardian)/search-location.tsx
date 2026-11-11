@@ -127,6 +127,18 @@ export default function SearchLocationScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Pressable
+            testID="back-from-location-button"
+            accessibilityRole="button"
+            onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+            style={styles.chip}
+          >
+            <Text variant="label" color="primary">
+              ← Voltar
+            </Text>
+          </Pressable>
+        </View>
         <Text variant="title">Onde buscar professores?</Text>
         <Text color="textMuted">
           Escolha o estado e a cidade. Se quiser, selecione seu bairro para ver primeiro os

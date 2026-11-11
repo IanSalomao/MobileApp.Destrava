@@ -33,6 +33,14 @@ export default function SearchResultsScreen() {
     [location.neighborhoods],
   );
 
+  function handleBackToHome() {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  }
+
   function formatLocationLabel(teacher: TeacherSearchResultRow): string {
     const isPrioritized =
       teacher.neighborhood &&
@@ -61,6 +69,21 @@ export default function SearchResultsScreen() {
         onEndReachedThreshold={0.4}
         ListHeaderComponent={
           <View style={styles.header}>
+            {/* Botão de voltar para a Home */}
+            <View style={styles.navBar}>
+              <Pressable
+                testID="back-to-home-button"
+                accessibilityRole="button"
+                accessibilityLabel="Voltar para o início"
+                onPress={handleBackToHome}
+                style={styles.backButton}
+              >
+                <Text variant="label" color="primary">
+                  ← Início
+                </Text>
+              </Pressable>
+            </View>
+
             <View style={styles.locationBar}>
               <View style={styles.locationTextWrap}>
                 <Text variant="subtitle">
@@ -167,6 +190,21 @@ const styles = StyleSheet.create({
   header: {
     gap: spacing.md,
     marginBottom: spacing.xs,
+  },
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    minHeight: layout.minTouchTarget,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   locationBar: {
     flexDirection: 'row',

@@ -7,10 +7,7 @@ import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import { TextField } from '@/components/ui/text-field';
 import { useLanguages, useSubjects } from '@/features/catalog/hooks';
-import {
-  useAvailableNeighborhoods,
-  useTeacherSearchState,
-} from '@/features/teacher-search/hooks';
+import { useAvailableNeighborhoods, useTeacherSearchState } from '@/features/teacher-search/hooks';
 import type { TutoringType } from '@/features/teacher-search/types';
 import { colors, layout, radius, spacing } from '@/theme';
 
@@ -30,40 +27,26 @@ const WEEKDAY_OPTIONS: { day: number; label: string }[] = [
 ];
 
 export default function SearchFiltersScreen() {
-  const { location, filters, setLocation, setFilters, resetFilters } =
-    useTeacherSearchState();
+  const { location, filters, setLocation, setFilters, resetFilters } = useTeacherSearchState();
 
   const subjectsQuery = useSubjects();
   const languagesQuery = useLanguages();
-  const neighborhoodsQuery = useAvailableNeighborhoods(
-    location.cityId,
-    location.state,
-  );
+  const neighborhoodsQuery = useAvailableNeighborhoods(location.cityId, location.state);
 
   const [subjectIds, setSubjectIds] = useState<string[]>(filters.subjectIds);
   const [languageIds, setLanguageIds] = useState<string[]>(filters.languageIds);
-  const [tutoringTypes, setTutoringTypes] = useState<TutoringType[]>(
-    filters.tutoringTypes,
-  );
+  const [tutoringTypes, setTutoringTypes] = useState<TutoringType[]>(filters.tutoringTypes);
   const [weekdays, setWeekdays] = useState<number[]>(filters.weekdays);
-  const [neighborhoods, setNeighborhoods] = useState<string[]>(
-    location.neighborhoods,
+  const [neighborhoods, setNeighborhoods] = useState<string[]>(location.neighborhoods);
+  const [neighborhoodMode, setNeighborhoodMode] = useState<'prioritize' | 'strict'>(
+    filters.neighborhoodMode,
   );
-  const [neighborhoodMode, setNeighborhoodMode] = useState<
-    'prioritize' | 'strict'
-  >(filters.neighborhoodMode);
   const [maxPriceReais, setMaxPriceReais] = useState<string>(
-    filters.maxHourlyRateCents
-      ? String(Math.round(filters.maxHourlyRateCents / 100))
-      : '',
+    filters.maxHourlyRateCents ? String(Math.round(filters.maxHourlyRateCents / 100)) : '',
   );
 
   function toggleItem<T>(list: T[], value: T, setter: (next: T[]) => void) {
-    setter(
-      list.includes(value)
-        ? list.filter((item) => item !== value)
-        : [...list, value],
-    );
+    setter(list.includes(value) ? list.filter((item) => item !== value) : [...list, value]);
   }
 
   function handleApply() {
@@ -91,22 +74,37 @@ export default function SearchFiltersScreen() {
     setMaxPriceReais('');
   }
 
+  function handleGoBack() {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  }
+
   const availableNeighborhoods = neighborhoodsQuery.data ?? [];
 
   return (
     <Screen>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <View style={styles.navBar}>
+          <Pressable
+            testID="back-from-filters-button"
+            accessibilityRole="button"
+            onPress={handleGoBack}
+            style={styles.chip}
+          >
+            <Text variant="label" color="primary">
+              ← Voltar
+            </Text>
+          </Pressable>
+        </View>
         <Text variant="title">Filtros de busca</Text>
 
         {/* Bairros da cidade atual */}
         {availableNeighborhoods.length > 0 ? (
           <View style={styles.section}>
-            <Text variant="subtitle">
-              Bairros disponíveis em {location.cityName}
-            </Text>
+            <Text variant="subtitle">Bairros disponíveis em {location.cityName}</Text>
             <View style={styles.chipsWrap}>
               {availableNeighborhoods.map((neighborhood) => {
                 const selected = neighborhoods.includes(neighborhood);
@@ -116,15 +114,10 @@ export default function SearchFiltersScreen() {
                     testID={`filter-neighborhood-${neighborhood}`}
                     accessibilityRole="button"
                     accessibilityState={{ selected }}
-                    onPress={() =>
-                      toggleItem(neighborhoods, neighborhood, setNeighborhoods)
-                    }
+                    onPress={() => toggleItem(neighborhoods, neighborhood, setNeighborhoods)}
                     style={[styles.chip, selected && styles.chipSelected]}
                   >
-                    <Text
-                      variant="caption"
-                      color={selected ? 'primary' : 'text'}
-                    >
+                    <Text variant="caption" color={selected ? 'primary' : 'text'}>
                       {neighborhood}
                     </Text>
                   </Pressable>
@@ -140,16 +133,11 @@ export default function SearchFiltersScreen() {
                     selected: neighborhoodMode === 'prioritize',
                   }}
                   onPress={() => setNeighborhoodMode('prioritize')}
-                  style={[
-                    styles.chip,
-                    neighborhoodMode === 'prioritize' && styles.chipSelected,
-                  ]}
+                  style={[styles.chip, neighborhoodMode === 'prioritize' && styles.chipSelected]}
                 >
                   <Text
                     variant="caption"
-                    color={
-                      neighborhoodMode === 'prioritize' ? 'primary' : 'text'
-                    }
+                    color={neighborhoodMode === 'prioritize' ? 'primary' : 'text'}
                   >
                     Escalonar (bairro primeiro, depois cidade)
                   </Text>
@@ -161,10 +149,7 @@ export default function SearchFiltersScreen() {
                     selected: neighborhoodMode === 'strict',
                   }}
                   onPress={() => setNeighborhoodMode('strict')}
-                  style={[
-                    styles.chip,
-                    neighborhoodMode === 'strict' && styles.chipSelected,
-                  ]}
+                  style={[styles.chip, neighborhoodMode === 'strict' && styles.chipSelected]}
                 >
                   <Text
                     variant="caption"
@@ -190,9 +175,7 @@ export default function SearchFiltersScreen() {
                   testID={`filter-tutoring-${option.id}`}
                   accessibilityRole="button"
                   accessibilityState={{ selected }}
-                  onPress={() =>
-                    toggleItem(tutoringTypes, option.id, setTutoringTypes)
-                  }
+                  onPress={() => toggleItem(tutoringTypes, option.id, setTutoringTypes)}
                   style={[styles.chip, selected && styles.chipSelected]}
                 >
                   <Text variant="caption" color={selected ? 'primary' : 'text'}>
@@ -228,9 +211,7 @@ export default function SearchFiltersScreen() {
                   testID={`filter-subject-${subject.id}`}
                   accessibilityRole="button"
                   accessibilityState={{ selected }}
-                  onPress={() =>
-                    toggleItem(subjectIds, subject.id, setSubjectIds)
-                  }
+                  onPress={() => toggleItem(subjectIds, subject.id, setSubjectIds)}
                   style={[styles.chip, selected && styles.chipSelected]}
                 >
                   <Text variant="caption" color={selected ? 'primary' : 'text'}>
@@ -254,9 +235,7 @@ export default function SearchFiltersScreen() {
                   testID={`filter-language-${language.id}`}
                   accessibilityRole="button"
                   accessibilityState={{ selected }}
-                  onPress={() =>
-                    toggleItem(languageIds, language.id, setLanguageIds)
-                  }
+                  onPress={() => toggleItem(languageIds, language.id, setLanguageIds)}
                   style={[styles.chip, selected && styles.chipSelected]}
                 >
                   <Text variant="caption" color={selected ? 'primary' : 'text'}>
@@ -294,11 +273,7 @@ export default function SearchFiltersScreen() {
 
         <View style={styles.actions}>
           <Button title="Ver professores" onPress={handleApply} />
-          <Button
-            title="Limpar filtros"
-            variant="ghost"
-            onPress={handleClear}
-          />
+          <Button title="Limpar filtros" variant="ghost" onPress={handleClear} />
         </View>
       </ScrollView>
     </Screen>
@@ -333,6 +308,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentSoft,
     borderColor: colors.primary,
   },
+  navBar: { flexDirection: 'row', alignItems: 'center' },
   actions: {
     gap: spacing.sm,
   },
