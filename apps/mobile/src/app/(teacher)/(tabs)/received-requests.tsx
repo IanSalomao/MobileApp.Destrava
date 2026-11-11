@@ -15,7 +15,6 @@ import type {
 } from '@/features/contact-requests/types';
 import { colors, spacing } from '@/theme';
 
-
 const FILTERS: { key: ReceivedRequestFilter; label: string }[] = [
   { key: 'pending', label: 'Pendentes' },
   { key: 'accepted', label: 'Aceitos' },

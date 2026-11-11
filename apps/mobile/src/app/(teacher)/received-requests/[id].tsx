@@ -27,7 +27,7 @@ import { formatDateTime } from '@/lib/date';
 import { formatRelativeTime } from '@/lib/relative-time';
 import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { colors, radius, spacing } from '@/theme';
-  
+
 type DisplayStatus = 'pending' | RequestDetailStatus;
 
 const PREFERENCE_LABELS: Record<
