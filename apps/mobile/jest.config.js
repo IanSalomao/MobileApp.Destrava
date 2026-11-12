@@ -25,6 +25,7 @@ module.exports = {
     'src/features/contact-requests/domain/contact-request.ts',
     'src/features/contact-requests/api.ts',
     'src/features/contact-requests/hooks.ts',
+    'src/features/settings/hooks.ts',
     'src/features/catalog/api.ts',
     'src/features/catalog/hooks.ts',
   ],
@@ -51,6 +52,12 @@ module.exports = {
       statements: 80,
     },
     './src/features/contact-requests/hooks.ts': {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+    './src/features/settings/hooks.ts': {
       branches: 80,
       functions: 80,
       lines: 80,
