@@ -34,6 +34,22 @@ export const SCHOOL_GRADE_LABELS: Record<SchoolGrade, string> = {
 
 export const SCHOOL_GRADES = Object.keys(SCHOOL_GRADE_LABELS) as SchoolGrade[];
 
+// Versão curta usada nos cards de solicitação ("7º ano", "1ª série EM").
+export const SCHOOL_GRADE_SHORT_LABELS: Record<SchoolGrade, string> = {
+  elementary_1: '1º ano',
+  elementary_2: '2º ano',
+  elementary_3: '3º ano',
+  elementary_4: '4º ano',
+  elementary_5: '5º ano',
+  elementary_6: '6º ano',
+  elementary_7: '7º ano',
+  elementary_8: '8º ano',
+  elementary_9: '9º ano',
+  high_school_1: '1º ano EM',
+  high_school_2: '2º ano EM',
+  high_school_3: '3º ano EM',
+};
+
 export const DAY_PERIOD_LABELS: Record<DayPeriod, string> = {
   morning: 'Manhã',
   afternoon: 'Tarde',
