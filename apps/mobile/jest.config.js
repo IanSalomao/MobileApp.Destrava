@@ -31,6 +31,10 @@ module.exports = {
     'src/features/favorites/domain.ts',
     'src/features/favorites/api.ts',
     'src/features/favorites/hooks.ts',
+    'src/features/teachers/public-profile/domain.ts',
+    'src/features/teachers/public-profile/api.ts',
+    'src/features/teachers/public-profile/hooks.ts',
+
   ],
   // Gate: a lógica das features COM teste precisa de >= 80%. Ao cobrir uma
   // feature nova, adicione o api.ts e o hooks.ts dela em collectCoverageFrom e
@@ -78,19 +82,28 @@ module.exports = {
       lines: 80,
       statements: 80,
     },
+
     './src/features/favorites/domain.ts': {
+    './src/features/teachers/public-profile/domain.ts': {
+      
       branches: 80,
       functions: 80,
       lines: 80,
       statements: 80,
     },
+
     './src/features/favorites/api.ts': {
+    './src/features/teachers/public-profile/api.ts': {
+
       branches: 80,
       functions: 80,
       lines: 80,
       statements: 80,
     },
+
     './src/features/favorites/hooks.ts': {
+    './src/features/teachers/public-profile/hooks.ts': {
+
       branches: 80,
       functions: 80,
       lines: 80,
