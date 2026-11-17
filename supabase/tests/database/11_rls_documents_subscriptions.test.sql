@@ -5,7 +5,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(19);
+select plan(22);
 
 -- Setup ---------------------------------------------------------------------------------------
 
@@ -173,30 +173,49 @@ select is_empty(
   'outro professor não lê o pagamento'
 );
 
--- Catálogo público -----------------------------------------------------------------------------
+-- Catálogo: qualquer usuário logado lê; anônimo não (RF03) -------------------------------------
+
+reset role;
+set local role authenticated;
+set local request.jwt.claim.sub = '44444444-4444-4444-4444-444444444444';
+
+select isnt_empty(
+  $$select id from public.subscription_plans where id = 'teacher_launch'$$,
+  'usuário logado lê plano ativo'
+);
+
+select is_empty(
+  $$select id from public.subscription_plans where id = 'inactive_plan'$$,
+  'usuário logado não lê plano inativo'
+);
+
+select isnt_empty(
+  $$select id from public.subjects$$,
+  'usuário logado lê as matérias'
+);
+
+select isnt_empty(
+  $$select id from public.languages$$,
+  'usuário logado lê os idiomas'
+);
 
 reset role;
 set local role anon;
 reset request.jwt.claim.sub;
 
-select isnt_empty(
+select is_empty(
   $$select id from public.subscription_plans where id = 'teacher_launch'$$,
-  'anônimo lê plano ativo'
+  'anônimo não lê planos (RF03)'
 );
 
 select is_empty(
-  $$select id from public.subscription_plans where id = 'inactive_plan'$$,
-  'anônimo não lê plano inativo'
-);
-
-select isnt_empty(
   $$select id from public.subjects$$,
-  'anônimo lê as matérias'
+  'anônimo não lê as matérias (RF03)'
 );
 
-select isnt_empty(
+select is_empty(
   $$select id from public.languages$$,
-  'anônimo lê os idiomas'
+  'anônimo não lê os idiomas (RF03)'
 );
 
 select * from finish();

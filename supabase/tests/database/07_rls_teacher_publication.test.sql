@@ -5,7 +5,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(13);
+select plan(17);
 
 -- Setup ---------------------------------------------------------------------------------------
 
@@ -14,6 +14,11 @@ insert into auth.users (id, email, raw_user_meta_data) values
     '11111111-1111-1111-1111-111111111111',
     'guardian1@test.com',
     '{"role":"guardian","full_name":"Guardian One","phone":"+5511999990001","terms_accepted":"true","terms_version":"test-1","minor_data_consent":"true"}'::jsonb
+  ),
+  (
+    '22222222-2222-2222-2222-222222222222',
+    'guardian2@test.com',
+    '{"role":"guardian","full_name":"Guardian Two","phone":"+5511999990002","terms_accepted":"true","terms_version":"test-1","minor_data_consent":"true"}'::jsonb
   ),
   (
     '33333333-3333-3333-3333-333333333333',
@@ -93,44 +98,73 @@ values (
 
 -- Anônimo, antes da expiração ----------------------------------------------------------------
 
-set local role anon;
-reset request.jwt.claim.sub;
+set local role authenticated;
+set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 
 select isnt_empty(
   $$select id from public.teachers where id = '33333333-3333-3333-3333-333333333333'$$,
-  'anônimo vê professor verificado com assinatura em trial'
+  'responsável sem vínculo vê professor verificado com assinatura em trial'
 );
 
 select is_empty(
   $$select id from public.teachers where id = '44444444-4444-4444-4444-444444444444'$$,
-  'anônimo não vê professor sem assinatura'
+  'responsável sem vínculo não vê professor sem assinatura'
 );
 
 select is_empty(
   $$select id from public.teachers where id = '55555555-5555-5555-5555-555555555555'$$,
-  'anônimo não vê professor com verificação pendente'
+  'responsável sem vínculo não vê professor com verificação pendente'
 );
 
 select isnt_empty(
   $$select id from public.profiles where id = '33333333-3333-3333-3333-333333333333'$$,
-  'anônimo vê o perfil do professor publicado'
+  'responsável sem vínculo vê o perfil do professor publicado'
 );
 
 select is_empty(
   $$select id from public.profiles where id = '44444444-4444-4444-4444-444444444444'$$,
-  'anônimo não vê o perfil do professor não publicado'
+  'responsável sem vínculo não vê o perfil do professor não publicado'
 );
 
 select isnt_empty(
   $$select teacher_id from public.teacher_subjects
     where teacher_id = '33333333-3333-3333-3333-333333333333'$$,
-  'anônimo vê as matérias do professor publicado'
+  'responsável sem vínculo vê as matérias do professor publicado'
 );
 
 select is_empty(
   $$select teacher_id from public.teacher_subjects
     where teacher_id = '44444444-4444-4444-4444-444444444444'$$,
-  'anônimo não vê as matérias do professor não publicado'
+  'responsável sem vínculo não vê as matérias do professor não publicado'
+);
+
+-- Anônimo não vê nem o professor publicado (RF03) ------------------------------------------------
+
+reset role;
+set local role anon;
+reset request.jwt.claim.sub;
+
+select is_empty(
+  $$select id from public.teachers where id = '33333333-3333-3333-3333-333333333333'$$,
+  'anônimo não vê professor publicado (RF03)'
+);
+
+select is_empty(
+  $$select id from public.profiles where id = '33333333-3333-3333-3333-333333333333'$$,
+  'anônimo não vê o perfil do professor publicado (RF03)'
+);
+
+select is_empty(
+  $$select teacher_id from public.teacher_subjects
+    where teacher_id = '33333333-3333-3333-3333-333333333333'$$,
+  'anônimo não vê as matérias do professor publicado (RF03)'
+);
+
+select throws_ok(
+  $$select * from public.search_teachers()$$,
+  '42501',
+  null,
+  'anônimo não executa search_teachers (RF03)'
 );
 
 -- Dono enxerga o próprio perfil mesmo sem publicação ------------------------------------------
@@ -161,12 +195,12 @@ select isnt_empty(
 );
 
 reset role;
-set local role anon;
-reset request.jwt.claim.sub;
+set local role authenticated;
+set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 
 select is_empty(
   $$select id from public.teachers where id = '33333333-3333-3333-3333-333333333333'$$,
-  'anônimo deixa de ver o professor depois da expiração'
+  'responsável sem vínculo deixa de ver o professor depois da expiração'
 );
 
 -- Colunas que o professor pode e não pode alterar ----------------------------------------------

@@ -5,7 +5,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(18);
+select plan(19);
 
 -- Setup ---------------------------------------------------------------------------------------
 
@@ -121,17 +121,26 @@ select throws_ok(
 );
 
 reset role;
-set local role anon;
-reset request.jwt.claim.sub;
+set local role authenticated;
+set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 
 select isnt_empty(
   $$select id from public.reviews where teacher_id = '33333333-3333-3333-3333-333333333333'$$,
-  'anônimo lê avaliações de professor publicado'
+  'outro responsável lê avaliações de professor publicado'
 );
 
 select is_empty(
   $$select id from public.reviews where teacher_id = '44444444-4444-4444-4444-444444444444'$$,
-  'anônimo não lê avaliações de professor não publicado'
+  'outro responsável não lê avaliações de professor não publicado'
+);
+
+reset role;
+set local role anon;
+reset request.jwt.claim.sub;
+
+select is_empty(
+  $$select id from public.reviews where teacher_id = '33333333-3333-3333-3333-333333333333'$$,
+  'anônimo não lê avaliações nem de professor publicado (RF03)'
 );
 
 reset role;

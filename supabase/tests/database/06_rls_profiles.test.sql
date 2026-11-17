@@ -120,9 +120,9 @@ select is_empty(
   'anônimo não lê perfil de responsável'
 );
 
-select isnt_empty(
+select is_empty(
   $$select id from public.profiles where id = '33333333-3333-3333-3333-333333333333'$$,
-  'anônimo lê perfil de professor publicado'
+  'anônimo não lê nem perfil de professor publicado (RF03)'
 );
 
 select is_empty(

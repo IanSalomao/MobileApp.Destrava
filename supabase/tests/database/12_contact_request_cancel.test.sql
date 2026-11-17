@@ -5,7 +5,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(5);
+select plan(6);
 
 -- Setup ---------------------------------------------------------------------------------------
 
@@ -103,6 +103,22 @@ select throws_ok(
   'P0001',
   'contact_request_not_allowed',
   'professor não cancela a solicitação'
+);
+
+-- Responsável não aceita o próprio pedido ------------------------------------------------------
+
+reset role;
+set local role authenticated;
+set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+
+select throws_ok(
+  $$update public.contact_requests
+    set status = 'accepted'
+    where guardian_id = '11111111-1111-1111-1111-111111111111'
+      and teacher_id = '33333333-3333-3333-3333-333333333333'$$,
+  'P0001',
+  'contact_request_not_allowed',
+  'responsável não aceita a própria solicitação'
 );
 
 -- Responsável dono cancela e pode pedir de novo -------------------------------------------------
