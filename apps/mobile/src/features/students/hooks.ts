@@ -1,14 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
 import { getAuthErrorMessage } from '@/features/auth/errors';
 
-import { createStudentProfile } from './api';
+import { createStudentProfile, listMyStudents } from './api';
 import { studentProfileSchema, type StudentProfileInput } from './schemas';
 
 export const studentKeys = {
   all: ['students'] as const,
+  list: () => [...studentKeys.all, 'list'] as const,
 };
 
 // ViewModel da etapa 2 do responsável ("Configure seu perfil"): formulário + criação do aluno.
@@ -29,4 +30,12 @@ export function useGuardianProfileForm(onCreated?: () => void) {
     isSubmitting: mutation.isPending,
     errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
   };
+}
+
+/** Alunos (filhos) do responsável logado. */
+export function useMyStudents() {
+  return useQuery({
+    queryKey: studentKeys.list(),
+    queryFn: listMyStudents,
+  });
 }
