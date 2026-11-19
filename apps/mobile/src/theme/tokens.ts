@@ -8,6 +8,8 @@ export const colors = {
   primarySoft: '#E8F5EE',
   primaryBorder: '#A7D7BE',
   onPrimary: '#FFFFFF',
+  // Formas translúcidas sobre o verde (hero das telas de boas-vindas).
+  overlayLight: 'rgba(255, 255, 255, 0.14)',
 
   // Secundárias / Apoio (compatibilidade + destaque)
   accent: '#1B7F4E',
