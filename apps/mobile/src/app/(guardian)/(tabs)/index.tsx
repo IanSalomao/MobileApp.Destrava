@@ -72,7 +72,7 @@ export default function GuardianHomeScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.headerContainer}>
-            {/* Barra superior: Localização + Notificações */}
+            {/* Barra superior: localização */}
             <View style={styles.topBar}>
               <View style={styles.locationInfo}>
                 <Text variant="caption" color="textMuted">
@@ -92,17 +92,6 @@ export default function GuardianHomeScreen() {
                 >
                   <Text variant="label" color="primary">
                     Alterar
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  testID="notifications-button"
-                  accessibilityRole="button"
-                  onPress={() => router.push('/notifications')}
-                  style={styles.actionPill}
-                >
-                  <Text variant="caption" color="text">
-                    Avisos
                   </Text>
                 </Pressable>
               </View>

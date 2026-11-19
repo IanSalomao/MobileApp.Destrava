@@ -199,59 +199,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      notifications: {
-        Row: {
-          contact_request_id: string | null;
-          created_at: string;
-          id: string;
-          read_at: string | null;
-          review_id: string | null;
-          type: Database['public']['Enums']['notification_type'];
-          user_id: string;
-        };
-        ComputedFields: never;
-        Insert: {
-          contact_request_id?: string | null;
-          created_at?: string;
-          id?: string;
-          read_at?: string | null;
-          review_id?: string | null;
-          type: Database['public']['Enums']['notification_type'];
-          user_id: string;
-        };
-        Update: {
-          contact_request_id?: string | null;
-          created_at?: string;
-          id?: string;
-          read_at?: string | null;
-          review_id?: string | null;
-          type?: Database['public']['Enums']['notification_type'];
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'notifications_contact_request_id_fkey';
-            columns: ['contact_request_id'];
-            isOneToOne: false;
-            referencedRelation: 'contact_requests';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'notifications_review_id_fkey';
-            columns: ['review_id'];
-            isOneToOne: false;
-            referencedRelation: 'reviews';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'notifications_user_id_fkey';
-            columns: ['user_id'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -1010,15 +957,6 @@ export type Database = {
       contact_request_status: 'pending' | 'accepted' | 'declined' | 'expired' | 'cancelled';
       day_period: 'morning' | 'afternoon' | 'evening';
       education_level: 'elementary_early' | 'elementary_late' | 'high_school';
-      notification_type:
-        | 'contact_request_received'
-        | 'contact_request_accepted'
-        | 'contact_request_declined'
-        | 'contact_request_expired'
-        | 'review_received'
-        | 'teacher_profile_approved'
-        | 'teacher_profile_rejected'
-        | 'subscription_ended';
       school_grade:
         | 'elementary_1'
         | 'elementary_2'
@@ -1184,16 +1122,6 @@ export const Constants = {
       contact_request_status: ['pending', 'accepted', 'declined', 'expired', 'cancelled'],
       day_period: ['morning', 'afternoon', 'evening'],
       education_level: ['elementary_early', 'elementary_late', 'high_school'],
-      notification_type: [
-        'contact_request_received',
-        'contact_request_accepted',
-        'contact_request_declined',
-        'contact_request_expired',
-        'review_received',
-        'teacher_profile_approved',
-        'teacher_profile_rejected',
-        'subscription_ended',
-      ],
       school_grade: [
         'elementary_1',
         'elementary_2',

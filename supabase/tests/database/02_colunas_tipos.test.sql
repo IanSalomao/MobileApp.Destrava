@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(9);
 
 select col_type_is('public', 'profiles', 'id', 'uuid', 'profiles.id é uuid');
 select col_type_is('public', 'profiles', 'full_name', 'text', 'profiles.full_name é text');
@@ -24,10 +24,6 @@ select col_type_is(
   'contact_requests.status usa o enum contact_request_status'
 );
 select col_type_is('public', 'reviews', 'rating', 'smallint', 'reviews.rating é smallint');
-select col_type_is(
-  'public', 'notifications', 'type', 'notification_type',
-  'notifications.type usa o enum notification_type'
-);
 select col_type_is(
   'public', 'teacher_documents', 'kind', 'teacher_document_kind',
   'teacher_documents.kind usa o enum teacher_document_kind'

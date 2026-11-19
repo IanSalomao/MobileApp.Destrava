@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(21);
 
 select has_enum('public', 'user_role', 'enum user_role existe');
 select enum_has_labels(
@@ -81,17 +81,7 @@ select enum_has_labels(
   'labels de subscription_status'
 );
 
-select has_enum('public', 'notification_type', 'enum notification_type existe');
-select enum_has_labels(
-  'public',
-  'notification_type',
-  array[
-    'contact_request_received', 'contact_request_accepted', 'contact_request_declined',
-    'contact_request_expired', 'review_received', 'teacher_profile_approved',
-    'teacher_profile_rejected', 'subscription_ended'
-  ],
-  'labels de notification_type'
-);
+select hasnt_enum('public', 'notification_type', 'enum notification_type saiu do escopo do MVP');
 
 select * from finish();
 rollback;

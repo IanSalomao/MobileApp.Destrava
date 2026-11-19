@@ -5,7 +5,6 @@ import { Stack } from 'expo-router';
 export default function SharedLayout() {
   return (
     <Stack>
-      <Stack.Screen name="notifications" options={{ title: 'Notificações' }} />
       <Stack.Screen name="settings" options={{ title: 'Configurações' }} />
       <Stack.Screen name="reviews/[teacherId]" options={{ title: 'Avaliações' }} />
     </Stack>

@@ -24,7 +24,7 @@ select has_table('public', 'favorite_teachers', 'favorite_teachers existe');
 select has_table('public', 'subscription_plans', 'subscription_plans existe');
 select has_table('public', 'subscriptions', 'subscriptions existe');
 select has_table('public', 'subscription_payments', 'subscription_payments existe');
-select has_table('public', 'notifications', 'notifications existe');
+select hasnt_table('public', 'notifications', 'notifications saiu do escopo do MVP');
 
 select * from finish();
 rollback;

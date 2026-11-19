@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { SCHOOL_GRADE_LABELS } from '@/features/catalog/types';
 import { DashboardContactRow } from '@/features/contact-requests/components/dashboard-contact-row';
 import { useTeacherDashboard } from '@/features/contact-requests/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
+import { getSubscriptionState, isSubscriptionRunning } from '@/features/subscriptions/domain';
+import { useMySubscription } from '@/features/subscriptions/hooks';
 import { formatRelativeTime } from '@/lib/relative-time';
 import { colors, layout, radius, spacing } from '@/theme';
 
@@ -43,6 +45,12 @@ function Stat({
 export default function TeacherDashboardScreen() {
   const profile = useMyProfile();
   const dashboard = useTeacherDashboard();
+  const subscription = useMySubscription();
+
+  // Perfil fora das buscas: falta a assinatura (teste encerrado ou nunca assinou) ou o cadastro
+  // profissional (verificação). O botão leva ao que falta.
+  const needsSubscription =
+    subscription.isSuccess && !isSubscriptionRunning(getSubscriptionState(subscription.data));
 
   const data = dashboard.data;
   const firstName = profile.data?.full_name?.trim().split(/\s+/)[0];
@@ -62,15 +70,6 @@ export default function TeacherDashboardScreen() {
                 Vamos ensinar?
               </Text>
             </View>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Notificações"
-              onPress={() => router.push('/notifications')}
-              style={({ pressed }) => [styles.bell, pressed && styles.bellPressed]}
-            >
-              <Ionicons name="notifications-outline" size={22} color={colors.onPrimary} />
-            </Pressable>
           </View>
 
           {data ? (
@@ -100,9 +99,17 @@ export default function TeacherDashboardScreen() {
                 </Text>
               </View>
               <Button
-                title={data.isPublished ? 'Ver perfil' : 'Ver assinatura'}
+                title={data.isPublished ? 'Ver perfil' : needsSubscription ? 'Assinar' : 'Concluir'}
                 variant={data.isPublished ? 'secondary' : 'primary'}
-                onPress={() => router.push(data.isPublished ? '/teacher-account' : '/subscription')}
+                onPress={() =>
+                  router.push(
+                    data.isPublished
+                      ? '/teacher-account'
+                      : needsSubscription
+                        ? '/teacher-subscription'
+                        : '/edit-profile',
+                  )
+                }
                 style={styles.statusButton}
               />
             </View>
@@ -212,17 +219,6 @@ const styles = StyleSheet.create({
   },
   greeting: {
     opacity: 0.85,
-  },
-  bell: {
-    width: layout.minTouchTarget,
-    height: layout.minTouchTarget,
-    borderRadius: radius.full,
-    backgroundColor: colors.primaryPressed,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bellPressed: {
-    opacity: 0.8,
   },
   statusCard: {
     flexDirection: 'row',

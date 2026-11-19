@@ -1,11 +1,11 @@
--- RLS: avaliações, favoritos e notificações.
+-- RLS: avaliações e favoritos.
 
 begin;
 
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(19);
+select plan(13);
 
 -- Setup ---------------------------------------------------------------------------------------
 
@@ -83,19 +83,6 @@ values (
   'Review de professor não publicado',
   'Guardian O.'
 );
-
--- Notificações de guardian1 e guardian2.
-insert into public.notifications (id, user_id, type) values
-  (
-    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1',
-    '11111111-1111-1111-1111-111111111111',
-    'review_received'
-  ),
-  (
-    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2',
-    '22222222-2222-2222-2222-222222222222',
-    'review_received'
-  );
 
 -- Reviews --------------------------------------------------------------------------------------
 
@@ -220,60 +207,6 @@ select results_eq(
     returning teacher_id$$,
   array['33333333-3333-3333-3333-333333333333'::uuid],
   'responsável remove o próprio favorito'
-);
-
--- Notificações ---------------------------------------------------------------------------------
-
-select isnt_empty(
-  $$select id from public.notifications
-    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'$$,
-  'usuário lê a própria notificação'
-);
-
-reset role;
-set local role authenticated;
-set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
-
-select is_empty(
-  $$select id from public.notifications
-    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'$$,
-  'outro usuário não lê a notificação'
-);
-
-select is_empty(
-  $$update public.notifications
-    set read_at = now()
-    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'
-    returning id$$,
-  'outro usuário não marca a notificação como lida'
-);
-
-select is_empty(
-  $$delete from public.notifications
-    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'
-    returning id$$,
-  'outro usuário não apaga a notificação'
-);
-
-reset role;
-set local role authenticated;
-set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
-
-select results_eq(
-  $$update public.notifications
-    set read_at = now()
-    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'
-    returning id$$,
-  array['bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'::uuid],
-  'usuário marca a própria notificação como lida'
-);
-
-select results_eq(
-  $$delete from public.notifications
-    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'
-    returning id$$,
-  array['bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1'::uuid],
-  'usuário apaga a própria notificação'
 );
 
 select * from finish();
