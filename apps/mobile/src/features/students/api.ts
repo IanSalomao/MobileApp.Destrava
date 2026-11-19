@@ -1,3 +1,4 @@
+import type { Subject } from '@/features/catalog/types';
 import { supabase } from '@/lib/supabase';
 
 import type { StudentProfileInput } from './schemas';
@@ -47,4 +48,30 @@ export async function listMyStudents(): Promise<StudentSummary[]> {
     schoolGrade: row.school_grade,
     preferredTutoringType: row.preferred_tutoring_type,
   }));
+}
+
+// Forma da linha de student_subjects com a matéria embutida (ver listMyStudentSubjects).
+type StudentSubjectRow = {
+  subjects: { id: string; name: string; sort_order: number } | null;
+};
+
+/**
+ * Matérias de interesse de todos os alunos do responsável logado ("Interesses" do Meu perfil),
+ * sem repetição e na ordem do catálogo. O RLS só devolve as matérias dos próprios alunos.
+ */
+export async function listMyStudentSubjects(): Promise<Subject[]> {
+  const { data, error } = await supabase
+    .from('student_subjects')
+    .select('subjects ( id, name, sort_order )');
+
+  if (error) throw error;
+
+  const byId = new Map<string, NonNullable<StudentSubjectRow['subjects']>>();
+  for (const row of data as unknown as StudentSubjectRow[]) {
+    if (row.subjects) byId.set(row.subjects.id, row.subjects);
+  }
+
+  return [...byId.values()]
+    .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name, 'pt-BR'))
+    .map(({ id, name }) => ({ id, name }));
 }
