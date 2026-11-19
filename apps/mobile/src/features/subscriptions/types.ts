@@ -6,3 +6,8 @@ export type SubscriptionPlan = Pick<
 >;
 
 export type Subscription = Tables<'subscriptions'>;
+
+export type SubscriptionPayment = Pick<
+  Tables<'subscription_payments'>,
+  'id' | 'amount_cents' | 'period_start' | 'period_end' | 'card_brand' | 'card_last4' | 'paid_at'
+>;
