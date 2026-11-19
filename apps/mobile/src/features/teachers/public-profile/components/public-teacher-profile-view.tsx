@@ -1,5 +1,6 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -10,20 +11,30 @@ import { formatHourlyRate } from '@/components/ui/teacher-card';
 import { Text } from '@/components/ui/text';
 import { colors, radius, spacing } from '@/theme';
 
+import { SOCIAL_NETWORK_LABELS } from '../../domain';
 import {
   formatEducationLevels,
+  formatSocialLink,
   formatLocation,
   formatPeriods,
   formatRatingSummary,
   formatTutoringTypes,
   formatWeekdays,
 } from '../domain';
-import type { PublicTeacherProfile } from '../types';
+import type { PublicTeacherProfile, TeacherContact } from '../types';
 
 type PublicTeacherProfileViewProps = {
   profile: PublicTeacherProfile;
   onRequestContact: () => void;
   onSeeReviews: () => void;
+  /** Situação do contato com o professor. Ausente = ainda sem solicitação. */
+  contact?: TeacherContact;
+  onSeeRequest?: (requestId: string) => void;
+  onOpenWhatsApp?: () => void;
+  onOpenSocialLink?: (url: string) => void;
+  onWriteReview?: () => void;
+  /** Erro ao abrir o WhatsApp ou a rede social. */
+  contactError?: string | null;
 };
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -55,6 +66,12 @@ export function PublicTeacherProfileView({
   profile,
   onRequestContact,
   onSeeReviews,
+  contact = { status: 'none' },
+  onSeeRequest,
+  onOpenWhatsApp,
+  onOpenSocialLink,
+  onWriteReview,
+  contactError,
 }: PublicTeacherProfileViewProps) {
   const location = formatLocation(profile.neighborhood, profile.cityName, profile.state);
   const tutoringTypes = formatTutoringTypes(profile.tutoringTypes);
@@ -167,11 +184,71 @@ export function PublicTeacherProfileView({
           ) : null}
         </Section>
 
-        <Banner description="O WhatsApp e a rede social do professor só aparecem depois que ele aceitar a sua solicitação de contato." />
+        {contact.status === 'accepted' ? (
+          <Section title="Contato liberado">
+            {contact.socialLinks.map((link) => (
+              <Pressable
+                key={link.network}
+                accessibilityRole="link"
+                accessibilityLabel={`Abrir ${SOCIAL_NETWORK_LABELS[link.network]}`}
+                onPress={() => onOpenSocialLink?.(link.url)}
+                style={({ pressed }) => [styles.contactRow, pressed && styles.contactRowPressed]}
+              >
+                <View style={styles.contactIcon}>
+                  <Ionicons name="link-outline" size={20} color={colors.primary} />
+                </View>
+                <View style={styles.contactTexts}>
+                  <Text variant="label" numberOfLines={1}>
+                    {formatSocialLink(link.url)}
+                  </Text>
+                  <Text variant="caption" color="textMuted">
+                    {SOCIAL_NETWORK_LABELS[link.network]}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+              </Pressable>
+            ))}
+            {contact.socialLinks.length === 0 ? (
+              <Text variant="body" color="textSecondary">
+                O professor ainda não cadastrou uma rede social.
+              </Text>
+            ) : null}
+            {contact.phone ? null : (
+              <Text variant="caption" color="textMuted">
+                O professor ainda não cadastrou o WhatsApp.
+              </Text>
+            )}
+            {onWriteReview ? (
+              <Button title="Avaliar professor" variant="secondary" onPress={onWriteReview} />
+            ) : null}
+          </Section>
+        ) : (
+          <Banner description="O WhatsApp e a rede social do professor só aparecem depois que ele aceitar a sua solicitação de contato." />
+        )}
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title="Solicitar contato" onPress={onRequestContact} />
+        {contactError ? (
+          <Text accessibilityRole="alert" variant="caption" color="danger">
+            {contactError}
+          </Text>
+        ) : null}
+        {contact.status === 'accepted' ? (
+          <Button
+            title="Conversar no WhatsApp"
+            disabled={!contact.phone}
+            onPress={() => onOpenWhatsApp?.()}
+            leftIcon={<Ionicons name="logo-whatsapp" size={18} color={colors.onPrimary} />}
+          />
+        ) : contact.status === 'pending' ? (
+          <Button
+            title="Solicitação enviada: ver pedido"
+            variant="secondary"
+            onPress={() => onSeeRequest?.(contact.requestId)}
+          />
+        ) : (
+          <Button title="Solicitar contato" onPress={onRequestContact} />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -237,7 +314,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
   },
+  contactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
+  contactRowPressed: {
+    backgroundColor: colors.primarySoft,
+  },
+  contactIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contactTexts: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
   footer: {
+    gap: spacing.xs,
     padding: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,

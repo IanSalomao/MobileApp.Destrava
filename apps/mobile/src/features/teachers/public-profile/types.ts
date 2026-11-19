@@ -28,3 +28,17 @@ export type PublicTeacherProfile = {
   ratingAverage: number | null;
   ratingCount: number;
 };
+
+export type TeacherSocialLink = { network: Enums<'social_network'>; url: string };
+
+// Situação do contato entre o responsável logado e o professor (RF09–RF11). O celular e a rede
+// social só chegam com a solicitação aceita: antes disso o RLS não devolve as linhas.
+export type TeacherContact =
+  | { status: 'none' }
+  | { status: 'pending'; requestId: string }
+  | {
+      status: 'accepted';
+      requestId: string;
+      phone: string | null;
+      socialLinks: TeacherSocialLink[];
+    };

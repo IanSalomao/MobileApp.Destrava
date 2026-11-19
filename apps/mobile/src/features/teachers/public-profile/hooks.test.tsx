@@ -3,12 +3,13 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 
 import * as api from './api';
-import { usePublicTeacherProfile } from './hooks';
+import { usePublicTeacherProfile, useTeacherContact } from './hooks';
 import type { PublicTeacherProfile } from './types';
 
 // Camada de ViewModel: testamos o hook mockando a camada de dados (api.ts).
 jest.mock('./api', () => ({
   getPublicTeacherProfile: jest.fn(),
+  getTeacherContact: jest.fn(),
 }));
 
 const mockGet = api.getPublicTeacherProfile as jest.MockedFunction<
@@ -73,5 +74,26 @@ describe('usePublicTeacherProfile', () => {
 
     expect(result.current.fetchStatus).toBe('idle');
     expect(mockGet).not.toHaveBeenCalled();
+  });
+});
+
+describe('useTeacherContact', () => {
+  const mockContact = api.getTeacherContact as jest.MockedFunction<typeof api.getTeacherContact>;
+  afterEach(() => jest.clearAllMocks());
+
+  it('expõe a situação do contato', async () => {
+    mockContact.mockResolvedValue({ status: 'pending', requestId: 'r1' });
+
+    const { result } = await renderHook(() => useTeacherContact('t1'), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual({ status: 'pending', requestId: 'r1' });
+  });
+
+  it('não busca nada enquanto não houver id', async () => {
+    await renderHook(() => useTeacherContact(undefined), { wrapper: createWrapper() });
+    expect(mockContact).not.toHaveBeenCalled();
   });
 });

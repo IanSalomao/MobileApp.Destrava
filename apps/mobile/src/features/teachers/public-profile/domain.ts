@@ -132,3 +132,23 @@ export function toPublicTeacherProfile(row: PublicTeacherRow): PublicTeacherProf
     ratingCount: row.rating_count,
   };
 }
+
+/** Link exibido sem o protocolo e o "www." (ex.: "instagram.com/profa.ana"). */
+export function formatSocialLink(url: string): string {
+  return url
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/$/, '');
+}
+
+/** Mensagem inicial do WhatsApp aberta pelo responsável no perfil do professor (RF10). */
+export function buildTeacherContactMessage(
+  teacherName: string,
+  guardianName?: string | null,
+): string {
+  const teacherFirstName = teacherName.trim().split(/\s+/)[0] || 'professor(a)';
+  const guardian = guardianName?.trim();
+  return guardian
+    ? `Olá, ${teacherFirstName}! Sou ${guardian} e falei com você pelo Destrava.`
+    : `Olá, ${teacherFirstName}! Falei com você pelo Destrava.`;
+}
