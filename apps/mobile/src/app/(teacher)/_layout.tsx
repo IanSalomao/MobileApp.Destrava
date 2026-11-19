@@ -9,8 +9,6 @@ export default function TeacherLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="received-requests/[id]" options={{ title: 'Detalhe da solicitação' }} />
       <Stack.Screen name="edit-profile" options={{ title: 'Editar perfil' }} />
-      <Stack.Screen name="subscription/index" options={{ title: 'Minha assinatura' }} />
-      <Stack.Screen name="subscription/card" options={{ title: 'Cartão de crédito' }} />
     </Stack>
   );
 }

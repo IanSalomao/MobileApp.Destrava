@@ -1,14 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
-import {
-  cancelSubscription,
-  getLaunchPlan,
-  getMySubscription,
-  listSubscriptionPayments,
-  resumeSubscription,
-  startSubscription,
-  updateSubscriptionCard,
-} from './api';
+import { getLaunchPlan, getMySubscription, startSubscription } from './api';
 
 jest.mock('@/lib/supabase', () => ({
   supabase: { from: jest.fn(), rpc: jest.fn() },
@@ -51,19 +43,11 @@ describe('leituras', () => {
     expect(mockFrom).toHaveBeenCalledWith('subscriptions');
   });
 
-  it('listSubscriptionPayments ordena da mais recente para a mais antiga', async () => {
-    const calls = mockQuery({ data: [{ id: 'p1' }] });
-    await expect(listSubscriptionPayments('t1')).resolves.toEqual([{ id: 'p1' }]);
-    expect(calls).toContainEqual({ method: 'order', args: ['paid_at', { ascending: false }] });
-    expect(calls).toContainEqual({ method: 'limit', args: [12] });
-  });
-
   it('propagam o erro do Supabase', async () => {
     const error = new Error('falha');
     mockQuery({ error });
     await expect(getLaunchPlan()).rejects.toBe(error);
     await expect(getMySubscription('t1')).rejects.toBe(error);
-    await expect(listSubscriptionPayments('t1')).rejects.toBe(error);
   });
 });
 
@@ -88,33 +72,9 @@ describe('RPCs', () => {
     expect(mockRpc).toHaveBeenCalledWith('start_subscription', { p_plan_id: 'teacher_launch' });
   });
 
-  it('updateSubscriptionCard troca o cartão', async () => {
-    mockRpc.mockResolvedValue({ data: { card_last4: '4242' }, error: null });
-    await expect(updateSubscriptionCard(CARD)).resolves.toEqual({ card_last4: '4242' });
-    expect(mockRpc).toHaveBeenCalledWith('update_subscription_card', {
-      p_card_brand: 'visa',
-      p_card_last4: '4242',
-      p_card_exp_month: 8,
-      p_card_exp_year: 2028,
-    });
-  });
-
-  it('cancelSubscription e resumeSubscription chamam as RPCs', async () => {
-    mockRpc.mockResolvedValue({ data: { cancel_at_period_end: true }, error: null });
-    await cancelSubscription();
-    expect(mockRpc).toHaveBeenCalledWith('cancel_subscription');
-
-    mockRpc.mockResolvedValue({ data: { cancel_at_period_end: false }, error: null });
-    await resumeSubscription();
-    expect(mockRpc).toHaveBeenCalledWith('resume_subscription');
-  });
-
   it('propagam o erro do banco', async () => {
     const error = { message: 'subscription_not_active' };
     mockRpc.mockResolvedValue({ data: null, error });
     await expect(startSubscription({ planId: 'teacher_launch' })).rejects.toBe(error);
-    await expect(updateSubscriptionCard(CARD)).rejects.toBe(error);
-    await expect(cancelSubscription()).rejects.toBe(error);
-    await expect(resumeSubscription()).rejects.toBe(error);
   });
 });

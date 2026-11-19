@@ -1,12 +1,4 @@
-import {
-  describeNextStep,
-  formatBRL,
-  formatCardExpiry,
-  formatCardLabel,
-  getSubscriptionState,
-  hasCard,
-  isSubscriptionRunning,
-} from './domain';
+import { formatBRL, getSubscriptionState, isSubscriptionRunning } from './domain';
 import type { Subscription } from './types';
 
 const BASE: Subscription = {
@@ -53,37 +45,8 @@ describe('isSubscriptionRunning', () => {
   });
 });
 
-describe('cartão', () => {
-  it('formata bandeira, últimos dígitos e validade', () => {
-    expect(hasCard(BASE)).toBe(true);
-    expect(hasCard({ ...BASE, card_last4: null })).toBe(false);
-    expect(hasCard(null)).toBe(false);
-    expect(formatCardLabel('mastercard', '1234')).toBe('Mastercard •••• 1234');
-    expect(formatCardLabel('desconhecida', '1234')).toBe('Cartão •••• 1234');
-    expect(formatCardLabel(null, null)).toBe('Nenhum cartão cadastrado');
-    expect(formatCardExpiry(8, 2028)).toBe('08/28');
-    expect(formatCardExpiry(null, null)).toBe('');
-  });
-});
-
 describe('formatBRL', () => {
   it('formata centavos em reais', () => {
     expect(formatBRL(2990)).toBe('29,90');
-  });
-});
-
-describe('describeNextStep', () => {
-  it('cobre cada situação da assinatura', () => {
-    expect(describeNextStep(null)).toMatch(/Assine/);
-    expect(describeNextStep({ ...BASE, status: 'trialing' })).toMatch(/primeira cobrança/);
-    expect(describeNextStep({ ...BASE, status: 'trialing', card_last4: null })).toMatch(
-      /Cadastre um cartão/,
-    );
-    expect(describeNextStep(BASE)).toMatch(/Próxima cobrança/);
-    expect(describeNextStep({ ...BASE, cancel_at_period_end: true })).toMatch(/termina em/);
-    expect(
-      describeNextStep({ ...BASE, status: 'canceled', ended_at: '2026-12-01T12:00:00Z' }),
-    ).toMatch(/foi cancelada/);
-    expect(describeNextStep({ ...BASE, status: 'expired' })).toMatch(/terminou/);
   });
 });

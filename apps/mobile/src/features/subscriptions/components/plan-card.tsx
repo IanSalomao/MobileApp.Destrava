@@ -1,5 +1,4 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
@@ -17,24 +16,11 @@ const PLAN_FEATURES = [
 
 type PlanCardProps = {
   plan: SubscriptionPlan | undefined;
-  /** Selo no topo do card (ex.: "PLANO DE LANÇAMENTO" ou a situação da assinatura). */
-  badge?: string;
-  /** Texto abaixo do preço. Padrão: dias grátis do plano. */
-  note?: string;
-  /** Esconde a lista de benefícios (ex.: na gestão da assinatura). */
-  hideFeatures?: boolean;
-  children?: ReactNode;
 };
 
 // Card verde do plano do professor (protótipo "ASSINATURA E PAGAMENTO"). A cobrança é simulada no
 // MVP, por isso o selo "Ilustrativo".
-export function PlanCard({
-  plan,
-  badge = 'PLANO DE LANÇAMENTO',
-  note,
-  hideFeatures = false,
-  children,
-}: PlanCardProps) {
+export function PlanCard({ plan }: PlanCardProps) {
   return (
     <View style={styles.planCard}>
       <View style={styles.illustrativeTag}>
@@ -45,7 +31,7 @@ export function PlanCard({
 
       <View style={styles.badge}>
         <Text variant="small" color="onPrimary">
-          {badge}
+          PLANO DE LANÇAMENTO
         </Text>
       </View>
 
@@ -59,23 +45,19 @@ export function PlanCard({
         <Text color="onPrimary"> /mês</Text>
       </View>
       <Text variant="caption" color="onPrimary" style={styles.note}>
-        {note ?? `${plan?.trial_days ?? 7} dias grátis. Cancele quando quiser.`}
+        {plan?.trial_days ?? 7} dias grátis. Cancele quando quiser.
       </Text>
 
-      {hideFeatures ? null : (
-        <View style={styles.features}>
-          {PLAN_FEATURES.map((feature) => (
-            <View key={feature} style={styles.featureRow}>
-              <Ionicons name="checkmark-circle" size={18} color={colors.onPrimary} />
-              <Text color="onPrimary" style={styles.featureText}>
-                {feature}
-              </Text>
-            </View>
-          ))}
-        </View>
-      )}
-
-      {children}
+      <View style={styles.features}>
+        {PLAN_FEATURES.map((feature) => (
+          <View key={feature} style={styles.featureRow}>
+            <Ionicons name="checkmark-circle" size={18} color={colors.onPrimary} />
+            <Text color="onPrimary" style={styles.featureText}>
+              {feature}
+            </Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
