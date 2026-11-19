@@ -56,7 +56,9 @@ O Destrava junta os dois lados numa plataforma só, com foco em **confiança e c
 | RF14   | Exibir para o pai a lista "Minhas solicitações", com o status de cada uma (pendente, aceita, recusada ou expirada) e o botão do WhatsApp nas aceitas.                                                                                                       |
 | RF15   | Exibir para o professor a lista "Solicitações recebidas", com aceitar e recusar nas pendentes e o botão do WhatsApp nas aceitas.                                                                                                                            |
 
-> **Mudanças em relação à apresentação:** o chat interno previsto originalmente (RF09, RF10, RF14 e RF15) foi substituído por um botão que abre o WhatsApp, liberado só depois do aceite. A mudança reduz o escopo do MVP (sem mensageria própria, moderação de conteúdo ou armazenamento de conversas) e mantém o número de telefone protegido até o professor aceitar, o que dá mais privacidade a famílias e professores. Por isso o Supabase Realtime também saiu da arquitetura. No MVP, a cobrança da assinatura (RF13) e a verificação de identidade (RF02) são **simuladas**: o fluxo funciona de ponta a ponta (teste grátis, cobrança mensal, cancelamento, aprovação do cadastro), mas nenhum pagamento real acontece e o documento é aprovado no envio. Também passaram a valer duas decisões posteriores da equipe: o **cadastro é obrigatório** — a primeira tela é o cadastro, com acesso ao login, e não há navegação anônima (RF03) — e a **busca por proximidade passou a ser por cidade e estado**, não por raio geográfico (RF04), o que removeu PostGIS, o Google Maps e a permissão de localização da arquitetura.
+> **Mudanças em relação à apresentação:** o chat interno previsto originalmente (RF09, RF10, RF14 e RF15) foi substituído por um botão que abre o WhatsApp, liberado só depois do aceite. A mudança reduz o escopo do MVP (sem mensageria própria, moderação de conteúdo ou armazenamento de conversas) e mantém o número de telefone protegido até o professor aceitar, o que dá mais privacidade a famílias e professores. Por isso o Supabase Realtime também saiu da arquitetura. No MVP, a cobrança da assinatura (RF13) e a verificação de identidade (RF02) são **simuladas**: o fluxo funciona de ponta a ponta (teste grátis, cobrança mensal e aprovação do cadastro), mas nenhum pagamento real acontece e o documento é aprovado no envio. Também passaram a valer duas decisões posteriores da equipe: o **cadastro é obrigatório** — a primeira tela é o cadastro, com acesso ao login, e não há navegação anônima (RF03) — e a **busca por proximidade passou a ser por cidade e estado**, não por raio geográfico (RF04), o que removeu PostGIS, o Google Maps e a permissão de localização da arquitetura.
+
+> **Cortes de escopo da entrega (19/11/2026):** para fechar o MVP no prazo, o grupo tirou três itens. (1) O **login com Google** saiu dos requisitos (era o RNF06; a numeração dos outros RNFs foi mantida para não quebrar as referências no código): o acesso é só por e-mail e senha. (2) As **notificações dentro do app** saíram: não há tela nem sino, e a tabela `notifications` e os gatilhos que a alimentavam foram removidos do banco; o responsável acompanha os pedidos em "Minhas solicitações" e o professor em "Solicitações recebidas". (3) A **tela de gestão da assinatura** (situação, troca de cartão, cancelar e retomar) saiu, por se tratar de uma versão de demonstração: o professor contrata a assinatura simulada uma vez, no onboarding, e o painel indica quando falta assinar ou concluir o cadastro.
 
 ## Requisitos não funcionais
 
@@ -67,7 +69,6 @@ O Destrava junta os dois lados numa plataforma só, com foco em **confiança e c
 | RNF03  | Estar em conformidade com a LGPD.                                                  |
 | RNF04  | Ser compatível com Android 8+ e iOS 13+.                                           |
 | RNF05  | Garantir disponibilidade (uptime) de pelo menos 99%.                               |
-| RNF06  | Permitir login e cadastro com conta Google (OAuth), além de e-mail e senha.        |
 | RNF07  | Solicitar apenas as permissões estritamente necessárias, sempre com justificativa. |
 | RNF08  | Ter tamanho de instalação inferior a 100 MB.                                       |
 | RNF09  | Armazenar os dados com backup automático periódico.                                |
@@ -98,7 +99,7 @@ flowchart LR
 | Componente                     | Função                                                                                                                                |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | App mobile                     | Interface do usuário; consome diretamente os serviços do Supabase (auth, banco e storage).                                            |
-| Supabase Auth                  | Autenticação de pais e professores, incluindo login com Google OAuth.                                                                 |
+| Supabase Auth                  | Autenticação de pais e professores por e-mail e senha.                                                                                |
 | Supabase Database (PostgreSQL) | Dados estruturados: perfis, solicitações de contato, avaliações e assinaturas. A busca filtra por cidade e estado (campos do perfil). |
 | Supabase Storage               | Fotos de perfil (bucket público) e documentos de verificação dos professores (bucket privado).                                        |
 | RLS, triggers e funções        | Regras de negócio: aceite e recusa, liberação do WhatsApp e da rede social, busca por cidade/estado e assinatura.                     |
@@ -222,7 +223,6 @@ O schema fica em `supabase/migrations/`, uma migração por domínio. Todas as t
 | Assinatura          | `subscription_plans`, `subscriptions`, `subscription_payments` (cobranças simuladas)         |
 | Responsáveis        | `students` (filhos), `student_subjects`, `favorite_teachers`                                 |
 | Contato e avaliação | `contact_requests` (`pending` → `accepted`, `declined` ou `expired`), `reviews`              |
-| Notificações        | `notifications` (geradas por triggers e consultadas pelo app)                                |
 
 A busca é a função `search_teachers` (cidade e estado, texto, matéria, idioma, preço, tipo de aula e dias). Dois jobs do pg_cron rodam a cada 15 minutos: um encerra testes grátis e registra as mensalidades simuladas, o outro expira solicitações sem resposta em 24 horas.
 
@@ -295,10 +295,10 @@ As rotas ficam em `src/app/`, agrupadas por quem pode abri-las. Os grupos (pasta
 | -------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `(auth)`       | Só quem está deslogado  | Escolha de perfil (`/welcome`, a primeira tela do app), cadastro, login e "esqueci minha senha".                      |
 | `(legal)`      | Todos                   | Termos de Uso e Política de Privacidade.                                                                              |
-| `(onboarding)` | Logado                  | Etapas logo depois do cadastro (perfil do responsável, assinatura e cadastro profissional) e a escolha de papel.      |
+| `(onboarding)` | Logado                  | Etapas logo depois do cadastro (perfil do responsável, assinatura e cadastro profissional).                           |
 | `(guardian)`   | Responsável             | Abas em `(tabs)`: Início (`/`), Solicitações e Perfil. As outras telas do responsável abrem por cima das abas.        |
 | `(teacher)`    | Professor               | Abas em `(tabs)`: Início (`/dashboard`), Solicitações e Perfil. As outras telas do professor abrem por cima das abas. |
-| `(shared)`     | Logado, nos dois papéis | Telas comuns: notificações, configurações e avaliações de um professor.                                               |
+| `(shared)`     | Logado, nos dois papéis | Telas comuns: configurações e avaliações de um professor.                                                             |
 
 - **As guardas ficam num lugar só:** `app/_layout.tsx` (com `Stack.Protected`), usando as regras de `features/auth/route-access.ts`. Quem abre uma área que não é a sua vai para o início do próprio papel (`homeHref`). Uma rota nova entra no grupo certo e herda a guarda; não crie guarda dentro da tela.
 - **Toda tela se registra** no `_layout.tsx` do seu grupo, com o título do header.
@@ -322,20 +322,19 @@ features/contact-requests/
   *.test.ts(x)    # testes ao lado do arquivo testado
 ```
 
-| Feature            | Domínio                                                           | Situação                          |
-| ------------------ | ----------------------------------------------------------------- | --------------------------------- |
-| `auth`             | Cadastro, login, sessão, guarda de rotas e aceite de termos       | Pronta (falta o login com Google) |
-| `profile`          | Perfil do usuário logado (`profiles`)                             | Leitura pronta                    |
-| `catalog`          | Matérias, idiomas, municípios e rótulos dos enums                 | Pronta                            |
-| `students`         | Alunos (filhos) do responsável                                    | Cadastro do onboarding            |
-| `teachers`         | Perfil do professor: cadastro, edição e leitura do perfil público | Cadastro do onboarding            |
-| `subscriptions`    | Assinatura e cartão (simulados)                                   | Início da assinatura              |
-| `contact-requests` | Solicitações de contato e botão do WhatsApp                       | Regras puras em `domain/`         |
-| `teacher-search`   | Busca e filtros (`search_teachers`)                               | A criar                           |
-| `reviews`          | Avaliações                                                        | A criar                           |
-| `favorites`        | Professores favoritos                                             | A criar                           |
-| `notifications`    | Notificações                                                      | A criar                           |
-| `settings`         | Limpeza de cache e preferências                                   | A criar                           |
+| Feature            | Domínio                                                           | Situação                           |
+| ------------------ | ----------------------------------------------------------------- | ---------------------------------- |
+| `auth`             | Cadastro, login, sessão, guarda de rotas e aceite de termos       | Pronta                             |
+| `profile`          | Perfil do usuário logado (`profiles`)                             | Leitura pronta                     |
+| `catalog`          | Matérias, idiomas, municípios e rótulos dos enums                 | Pronta                             |
+| `students`         | Alunos (filhos) do responsável                                    | Cadastro do onboarding             |
+| `teachers`         | Perfil do professor: cadastro, edição e leitura do perfil público | Cadastro do onboarding             |
+| `subscriptions`    | Assinatura e cartão (simulados)                                   | Pronta (contratação no onboarding) |
+| `contact-requests` | Solicitações de contato e botão do WhatsApp                       | Regras puras em `domain/`          |
+| `teacher-search`   | Busca e filtros (`search_teachers`)                               | A criar                            |
+| `reviews`          | Avaliações                                                        | A criar                            |
+| `favorites`        | Professores favoritos                                             | A criar                            |
+| `settings`         | Limpeza de cache e preferências                                   | A criar                            |
 
 ### Onde colocar cada coisa
 
@@ -364,7 +363,7 @@ features/contact-requests/
 
 ## Divisão das telas do MVP
 
-Cada pessoa ficou com uma fatia vertical: as telas de um fluxo e as features que elas usam (api, hooks e componentes). Assim cada um trabalha em pastas diferentes e os conflitos de merge ficam raros. São 24 telas: a busca tem 4, por concentrar a lógica mais pesada (RPC, paginação, filtros compartilhados entre telas e o limite de 2 s do RNF01); as outras fatias têm 5.
+Cada pessoa ficou com uma fatia vertical: as telas de um fluxo e as features que elas usam (api, hooks e componentes). Assim cada um trabalha em pastas diferentes e os conflitos de merge ficam raros. Eram 24 telas: a busca tem 4, por concentrar a lógica mais pesada (RPC, paginação, filtros compartilhados entre telas e o limite de 2 s do RNF01), e as outras fatias tinham 5. Com os cortes de escopo de 19/11/2026 (veja "Requisitos funcionais") saíram as notificações, a gestão da assinatura (com o cartão) e a escolha de papel do login com Google, e ficaram 20.
 
 As rotas já existem. Cada uma mostra no centro o nome do responsável e, embaixo, botões para as telas seguintes do fluxo, para dar para navegar pelo app inteiro desde já. Para começar a sua tela, troque o conteúdo do arquivo da rota pela tela de verdade, mantendo a rota e a navegação. A coluna "Protótipo" é o nome da tela exportada do Figma.
 
@@ -391,11 +390,8 @@ flowchart TD
         rdetail["Detalhe da solicitação<br/>Valeria"]
         taccount["Meu perfil<br/>Ian"]
         edit["Editar perfil<br/>Ian"]
-        sub["Minha assinatura<br/>Ian"]
-        card["Cartão de crédito<br/>Ian"]
     end
     subgraph C[Comuns aos dois papéis]
-        notif["Notificações<br/>Valeria"]
         settings["Configurações<br/>Valeria"]
         reviews["Avaliações<br/>Fátima"]
     end
@@ -407,9 +403,7 @@ flowchart TD
     account --> student & fav & settings
     fav --> teacher
     dash --> recv --> rdetail
-    taccount --> edit & sub & reviews & settings
-    sub --> card
-    home & dash --> notif
+    taccount --> edit & reviews & settings
 ```
 
 ### Anna Beatriz Lima: busca de professores (RF04, RF05, RNF01)
@@ -447,29 +441,25 @@ Features: `teachers` (leitura do perfil público), `reviews`, `favorites` (inclu
 
 Features: `contact-requests` (lado do responsável: criar, listar, cancelar e pedir de novo, mais o botão "Conversar no WhatsApp" do RF10) e `students`. As regras puras de status já estão em `contact-requests/domain/`.
 
-### Valeria Soares: área do professor, notificações e configurações (RF08, RF09, RF10, RF15, RNF10)
+### Valeria Soares: área do professor e configurações (RF08, RF09, RF10, RF15, RNF10)
 
 | Tela                   | Rota                      | Arquivo em `apps/mobile/src/app/`        | Protótipo                                   |
 | ---------------------- | ------------------------- | ---------------------------------------- | ------------------------------------------- |
 | Início do professor    | `/dashboard`              | `(teacher)/(tabs)/dashboard.tsx`         | AREA DO PROFESSOR - HOME                    |
 | Solicitações recebidas | `/received-requests`      | `(teacher)/(tabs)/received-requests.tsx` | Lista do RF15                               |
 | Detalhe da solicitação | `/received-requests/[id]` | `(teacher)/received-requests/[id].tsx`   | DETALHES DA SOLICITACAO (ACEITA e RECUSADA) |
-| Notificações           | `/notifications`          | `(shared)/notifications.tsx`             | O sino das duas homes                       |
 | Configurações          | `/settings`               | `(shared)/settings.tsx`                  | Limpar cache, termos e sair                 |
 
-Features: `contact-requests` (lado do professor: listar, aceitar e recusar), `notifications` e `settings` (limpeza do cache local, RNF10).
+Features: `contact-requests` (lado do professor: listar, aceitar e recusar) e `settings` (limpeza do cache local, RNF10).
 
-### Ian Salomão: conta do professor, assinatura e login com Google (RF01, RF11, RF13, RNF06)
+### Ian Salomão: conta do professor (RF01, RF11)
 
-| Tela                       | Rota                 | Arquivo em `apps/mobile/src/app/`      | Protótipo                            |
-| -------------------------- | -------------------- | -------------------------------------- | ------------------------------------ |
-| Meu perfil (professor)     | `/teacher-account`   | `(teacher)/(tabs)/teacher-account.tsx` | Prévia do perfil público e menu      |
-| Editar perfil profissional | `/edit-profile`      | `(teacher)/edit-profile.tsx`           | CADASTRO PROFISSIONAL (etapas 1 a 3) |
-| Minha assinatura           | `/subscription`      | `(teacher)/subscription/index.tsx`     | ASSINATURA E PAGAMENTO               |
-| Cartão de crédito          | `/subscription/card` | `(teacher)/subscription/card.tsx`      | ASSINATURA E PAGAMENTO               |
-| Escolha de papel (Google)  | `/choose-role`       | `(onboarding)/choose-role.tsx`         | ESCOLHA DE PERFIL                    |
+| Tela                       | Rota               | Arquivo em `apps/mobile/src/app/`      | Protótipo                            |
+| -------------------------- | ------------------ | -------------------------------------- | ------------------------------------ |
+| Meu perfil (professor)     | `/teacher-account` | `(teacher)/(tabs)/teacher-account.tsx` | Prévia do perfil público e menu      |
+| Editar perfil profissional | `/edit-profile`    | `(teacher)/edit-profile.tsx`           | CADASTRO PROFISSIONAL (etapas 1 a 3) |
 
-Features: `teachers` (edição do perfil e links de rede social), `subscriptions` e `auth` (login com Google). A edição reaproveita o formulário de `(onboarding)/teacher-professional` e o cartão, o de `(onboarding)/teacher-subscription`. O layout raiz já manda para `/choose-role` todo usuário logado sem papel, que é o caso de quem entra com o Google.
+Features: `teachers` (edição do perfil e link de rede social). A edição reaproveita o formulário de 3 etapas de `(onboarding)/teacher-professional`.
 
 ### Pontos de contato entre as fatias
 
