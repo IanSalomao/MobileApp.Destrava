@@ -14,6 +14,8 @@ export type FilePickerFieldProps = {
   onPress: () => void;
   loading?: boolean;
   error?: string;
+  /** Arquivo travado (ex.: documento já verificado): mostra o nome, sem ação. */
+  disabled?: boolean;
 };
 
 // Linha de upload de documento/certificado (apresentacional). Quem escolhe/envia é a tela/hook.
@@ -24,6 +26,7 @@ export function FilePickerField({
   onPress,
   loading = false,
   error,
+  disabled = false,
 }: FilePickerFieldProps) {
   const done = Boolean(fileName);
 
@@ -33,7 +36,8 @@ export function FilePickerField({
         accessibilityRole="button"
         accessibilityLabel={title}
         onPress={onPress}
-        disabled={loading}
+        disabled={loading || disabled}
+        accessibilityState={{ disabled: loading || disabled }}
         style={[styles.row, error ? styles.rowError : null]}
       >
         <Ionicons

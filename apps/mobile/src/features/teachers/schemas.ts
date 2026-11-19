@@ -4,6 +4,8 @@ import { BRAZILIAN_STATES } from '@/features/catalog/types';
 import { currencyToCents } from '@/lib/masks';
 import { isValidCpf } from '@/lib/cpf';
 
+import { isValidSocialUrl } from './domain';
+
 // Campos de texto e seleção do cadastro profissional (os arquivos ficam em estado próprio no hook).
 // Os refinamentos espelham o que submit_teacher_profile exige, para o erro aparecer antes do envio.
 export const teacherProfileSchema = z.object({
@@ -30,6 +32,14 @@ export const teacherProfileSchema = z.object({
   periods: z
     .array(z.enum(['morning', 'afternoon', 'evening']))
     .min(1, 'Selecione ao menos um período.'),
+  // Link de rede social (opcional): só aparece para a família depois do aceite (RF11).
+  socialNetwork: z.enum(['instagram', 'facebook', 'linkedin', 'tiktok', 'youtube', 'website']),
+  socialUrl: z
+    .string()
+    .refine(
+      (value) => !value.trim() || isValidSocialUrl(value),
+      'Informe um link válido (ex.: instagram.com/seuperfil).',
+    ),
 });
 
 export type TeacherProfileInput = z.infer<typeof teacherProfileSchema>;
@@ -37,6 +47,6 @@ export type TeacherProfileInput = z.infer<typeof teacherProfileSchema>;
 // Campos validados ao avançar cada etapa do formulário.
 export const TEACHER_STEP_FIELDS = {
   1: ['fullName', 'cpf', 'state', 'cityId'],
-  2: ['subjectIds', 'languageIds', 'bio'],
+  2: ['subjectIds', 'languageIds', 'bio', 'socialNetwork', 'socialUrl'],
   3: ['tutoringTypes', 'hourlyRate', 'weekdays', 'periods'],
 } as const satisfies Record<number, readonly (keyof TeacherProfileInput)[]>;
