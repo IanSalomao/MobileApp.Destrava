@@ -11,11 +11,7 @@ export interface RequestSentViewProps {
   onGoHome: () => void;
 }
 
-export function RequestSentView({
-  teacherName,
-  onTrackRequest,
-  onGoHome,
-}: RequestSentViewProps) {
+export function RequestSentView({ teacherName, onTrackRequest, onGoHome }: RequestSentViewProps) {
   const description = teacherName
     ? `${teacherName} tem até 24 horas para responder.`
     : 'O professor tem até 24 horas para responder.';

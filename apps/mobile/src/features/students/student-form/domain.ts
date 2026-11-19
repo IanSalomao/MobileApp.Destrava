@@ -9,9 +9,7 @@ export const NEW_STUDENT_ID = 'new';
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type StudentRoute =
-  | { mode: 'new' }
-  | { mode: 'edit'; studentId: string }
-  | { mode: 'invalid' };
+  { mode: 'new' } | { mode: 'edit'; studentId: string } | { mode: 'invalid' };
 
 /**
  * Lê o parâmetro `id` da rota. "new" cadastra, um uuid edita e qualquer outra coisa é inválida,

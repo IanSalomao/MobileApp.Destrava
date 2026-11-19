@@ -44,8 +44,7 @@ export function useMyContactRequest(requestId: string | undefined) {
 
   const query = useQuery({
     queryKey: myRequestKeys.detail(guardianId ?? 'anonymous', requestId ?? 'unknown'),
-    queryFn:
-      guardianId && requestId ? () => getMyContactRequest(guardianId, requestId) : skipToken,
+    queryFn: guardianId && requestId ? () => getMyContactRequest(guardianId, requestId) : skipToken,
   });
 
   const request = query.data;

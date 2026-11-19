@@ -43,9 +43,7 @@ export function ContactRequestForm({
     <Screen>
       <TeacherSummaryCard name={teacher.fullName} avatarUrl={teacher.avatarUrl} />
 
-      <Banner
-        description="Seu WhatsApp e o do professor só aparecem depois que ele aceitar o pedido."
-      />
+      <Banner description="Seu WhatsApp e o do professor só aparecem depois que ele aceitar o pedido." />
 
       <Text variant="subtitle">Seus dados</Text>
       <FormTextField
