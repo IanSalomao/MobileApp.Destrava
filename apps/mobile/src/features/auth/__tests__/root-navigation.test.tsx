@@ -18,7 +18,7 @@ let mockSession: MockSession = null;
 let mockRole: UserRole | null | undefined;
 const mockListeners = new Set<() => void>();
 
-/** Loga com o papel dado (null = logado sem papel, como no login com Google) ou desloga. */
+/** Loga com o papel dado (null = logado sem papel conhecido, perfil não carregou) ou desloga. */
 function setSession(role: UserRole | null | 'signed-out') {
   mockSession = role === 'signed-out' ? null : { user: { id: `${role ?? 'sem-papel'}-1` } };
   mockRole = role === 'signed-out' ? undefined : role;
@@ -45,8 +45,14 @@ jest.mock('@/features/auth/session-provider', () => {
 jest.mock('@/features/profile/hooks', () => ({
   useMyProfile: () => ({
     isPending: false,
+    isFetching: false,
+    refetch: jest.fn(),
     data: mockSession ? { role: mockRole } : undefined,
   }),
+}));
+
+jest.mock('@/features/auth/hooks', () => ({
+  useSignOut: () => ({ mutate: jest.fn() }),
 }));
 
 const stub = (label: string) =>
@@ -69,7 +75,6 @@ const routes = {
   '(auth)/forgot-password': stub('Esqueci minha senha'),
   '(onboarding)/_layout': NestedStack,
   '(onboarding)/guardian-profile': stub('Perfil do responsável'),
-  '(onboarding)/choose-role': stub('Escolha de papel'),
   '(guardian)/_layout': NestedStack,
   '(guardian)/(tabs)/_layout': NestedStack,
   '(guardian)/(tabs)/index': stub(GUARDIAN_HOME),
@@ -81,7 +86,7 @@ const routes = {
   '(teacher)/(tabs)/dashboard': stub(TEACHER_HOME),
   '(teacher)/(tabs)/received-requests': stub('Solicitações recebidas'),
   '(shared)/_layout': NestedStack,
-  '(shared)/notifications': stub('Notificações'),
+  '(shared)/settings': stub('Configurações'),
 };
 
 describe('RF03: navegação exige login e começa no cadastro', () => {
@@ -103,7 +108,7 @@ describe('RF03: navegação exige login e começa no cadastro', () => {
     ['uma aba do responsável', '/my-requests', 'Minhas solicitações'],
     ['uma tela do responsável', '/search', 'Resultado da busca'],
     ['o início do professor', '/dashboard', TEACHER_HOME],
-    ['uma tela comum aos dois papéis', '/notifications', 'Notificações'],
+    ['uma tela comum aos dois papéis', '/settings', 'Configurações'],
     ['o onboarding', '/guardian-profile', 'Perfil do responsável'],
   ])('visitante que abre %s por link vai para a escolha de perfil', async (_area, url, text) => {
     const router = await renderRouter(routes, { initialUrl: url });
@@ -145,13 +150,14 @@ describe('AUT-05: cada papel abre a própria área', () => {
     expect(screen.queryByText(WELCOME)).toBeNull();
   });
 
-  it('logado sem papel (login com Google) vai para a escolha de papel', async () => {
+  it('logado sem papel conhecido (perfil não carregou) vê o aviso, sem abrir nenhuma área', async () => {
     setSession(null);
 
-    const router = await renderRouter(routes, { initialUrl: '/' });
+    await renderRouter(routes, { initialUrl: '/' });
 
-    expect(router.getPathname()).toBe('/choose-role');
-    expect(screen.getByText('Escolha de papel')).toBeTruthy();
+    expect(screen.getByText('Não foi possível carregar sua conta')).toBeTruthy();
+    expect(screen.queryByText(GUARDIAN_HOME)).toBeNull();
+    expect(screen.queryByText(WELCOME)).toBeNull();
   });
 
   it('usuário logado que abre o cadastro por link vai para o próprio início', async () => {
@@ -184,10 +190,10 @@ describe('AUT-05: cada papel abre a própria área', () => {
   it.each<UserRole>(['guardian', 'teacher'])('%s abre as telas comuns', async (role) => {
     setSession(role);
 
-    const router = await renderRouter(routes, { initialUrl: '/notifications' });
+    const router = await renderRouter(routes, { initialUrl: '/settings' });
 
-    expect(router.getPathname()).toBe('/notifications');
-    expect(screen.getByText('Notificações')).toBeTruthy();
+    expect(router.getPathname()).toBe('/settings');
+    expect(screen.getByText('Configurações')).toBeTruthy();
   });
 
   it.each<[UserRole, string, string]>([

@@ -1,37 +1,26 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import {
-  useController,
-  useWatch,
-  type Control,
-  type FieldValues,
-  type Path,
-} from 'react-hook-form';
+import { useController, useWatch, type Control } from 'react-hook-form';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Text } from '@/components/ui/text';
 import { spacing } from '@/theme';
 
 import { MINOR_DATA_CLAUSE } from '../consent';
-// Campos de consentimento que o formulário precisa ter (cadastro e escolha de papel).
-type ConsentValues = FieldValues & {
-  role?: string;
-  termsAccepted: boolean;
-  minorDataConsent: boolean;
-};
+import type { SignUpInput } from '../schemas';
 
 // AUT-09: aceite dos Termos e da Política (todos) e, só para responsável, a cláusula
 // específica sobre os dados do aluno menor de idade.
-export function TermsConsentFields<T extends ConsentValues>({ control }: { control: Control<T> }) {
-  const role = useWatch({ control, name: 'role' as Path<T> });
+export function TermsConsentFields({ control }: { control: Control<SignUpInput> }) {
+  const role = useWatch({ control, name: 'role' });
   const {
     field: { value: termsAccepted, onChange: setTermsAccepted },
     fieldState: { error: termsError },
-  } = useController({ control, name: 'termsAccepted' as Path<T> });
+  } = useController({ control, name: 'termsAccepted' });
   const {
     field: { value: minorDataConsent, onChange: setMinorDataConsent },
     fieldState: { error: minorError },
-  } = useController({ control, name: 'minorDataConsent' as Path<T> });
+  } = useController({ control, name: 'minorDataConsent' });
 
   return (
     <View style={styles.container}>

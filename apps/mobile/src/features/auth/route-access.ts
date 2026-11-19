@@ -23,13 +23,14 @@ export function canAccess(area: RouteArea, { isSignedIn, role }: AccessState): b
 export const GUARDIAN_HOME = '/';
 export const TEACHER_HOME = '/dashboard';
 
-export type HomeHref = '/welcome' | typeof GUARDIAN_HOME | typeof TEACHER_HOME | '/choose-role';
+export type HomeHref = '/welcome' | typeof GUARDIAN_HOME | typeof TEACHER_HOME;
 
 /**
  * Destino de quem tenta abrir uma área barrada e de quem acabou de entrar ou sair:
  * - deslogado: a escolha de perfil (primeira tela do app, RF03);
  * - responsável e professor: o início da própria área;
- * - logado sem papel (login com Google, RNF06): a escolha de papel no onboarding.
+ * - logado sem papel conhecido (o perfil não carregou): a primeira tela. Na prática o layout raiz
+ *   nem monta as rotas nesse caso; mostra o aviso de conta indisponível (veja hasKnownRole).
  * Vai explícito no `redirectTo` de cada guarda porque, sem ele, o Expo Router manda para a URL do
  * grupo (ex.: `/(auth)`), que não tem index ("Unmatched Route").
  */
@@ -37,5 +38,13 @@ export function homeHref({ isSignedIn, role }: AccessState): HomeHref {
   if (!isSignedIn) return '/welcome';
   if (role === 'guardian') return GUARDIAN_HOME;
   if (role === 'teacher') return TEACHER_HOME;
-  return '/choose-role';
+  return '/welcome';
+}
+
+/**
+ * Todo cadastro tem papel (o formulário exige e o banco grava). Logado sem papel conhecido só
+ * acontece se o perfil não carregou: o layout raiz mostra um aviso com "Tentar de novo" e "Sair".
+ */
+export function hasKnownRole({ isSignedIn, role }: AccessState): boolean {
+  return !isSignedIn || role === 'guardian' || role === 'teacher';
 }

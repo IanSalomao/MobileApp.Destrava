@@ -844,15 +844,6 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      complete_role_choice: {
-        Args: {
-          p_minor_data_consent?: boolean;
-          p_phone?: string;
-          p_role: Database['public']['Enums']['user_role'];
-          p_terms_version: string;
-        };
-        Returns: Database['public']['Enums']['user_role'];
-      };
       expire_contact_requests: { Args: Record<PropertyKey, never>; Returns: undefined };
       is_card_expired: { Args: { exp_month: number; exp_year: number }; Returns: boolean };
       is_valid_cpf: { Args: { cpf: string }; Returns: boolean };

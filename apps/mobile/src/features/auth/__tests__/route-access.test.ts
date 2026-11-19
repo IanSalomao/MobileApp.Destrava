@@ -1,4 +1,10 @@
-import { canAccess, homeHref, type AccessState, type RouteArea } from '../route-access';
+import {
+  canAccess,
+  hasKnownRole,
+  homeHref,
+  type AccessState,
+  type RouteArea,
+} from '../route-access';
 
 const visitor: AccessState = { isSignedIn: false, role: undefined };
 const guardian: AccessState = { isSignedIn: true, role: 'guardian' };
@@ -35,8 +41,20 @@ describe('RF03: homeHref (destino de quem é barrado)', () => {
     ['visitante vai para a escolha de perfil', visitor, '/welcome'],
     ['responsável vai para o início da área do responsável', guardian, '/'],
     ['professor vai para o início da área do professor', teacher, '/dashboard'],
-    ['logado sem papel (Google, RNF06) vai para a escolha de papel', noRole, '/choose-role'],
+    ['logado sem papel conhecido cai na primeira tela', noRole, '/welcome'],
   ])('%s', (_label, state, expected) => {
     expect(homeHref(state)).toBe(expected);
+  });
+});
+
+describe('hasKnownRole', () => {
+  it('visitante e usuários com papel seguem para as rotas', () => {
+    expect(hasKnownRole(visitor)).toBe(true);
+    expect(hasKnownRole(guardian)).toBe(true);
+    expect(hasKnownRole(teacher)).toBe(true);
+  });
+
+  it('logado sem papel conhecido (perfil não carregou) vê o aviso', () => {
+    expect(hasKnownRole(noRole)).toBe(false);
   });
 });

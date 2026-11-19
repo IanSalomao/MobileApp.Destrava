@@ -2,25 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
-import { profileKeys } from '@/features/profile/hooks';
 import type { UserRole } from '@/features/profile/types';
 
-import {
-  completeRoleChoice,
-  defaultAuthRepository,
-  signInWithGoogle,
-  signOut,
-  signUp,
-  type AuthRepository,
-} from './api';
+import { defaultAuthRepository, signOut, signUp, type AuthRepository } from './api';
 import { getAuthErrorMessage } from './errors';
 import { PASSWORD_RESET_CONFIRMATION } from './password-reset';
 import {
-  chooseRoleSchema,
   forgotPasswordSchema,
   signInSchema,
   signUpSchema,
-  type ChooseRoleInput,
   type ForgotPasswordInput,
   type SignInInput,
   type SignUpInput,
@@ -110,49 +100,4 @@ export function useSignOut() {
     // Limpa o cache para que dados de um usuário não apareçam para o próximo.
     onSuccess: () => queryClient.clear(),
   });
-}
-
-// Login com Google (RNF06). Com sessão, a guarda de rotas leva ao início do papel ou, para conta nova,
-// à escolha de papel. Fechar o navegador não é erro.
-export function useGoogleSignIn() {
-  const mutation = useMutation({ mutationFn: signInWithGoogle });
-
-  return {
-    signIn: () => mutation.mutate(),
-    isPending: mutation.isPending,
-    errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
-  };
-}
-
-// ViewModel da escolha de papel (conta criada pelo Google): papel, celular e aceite dos Termos.
-// Depois de gravar, recarrega o perfil (a guarda passa a liberar a área do papel) e segue para o
-// onboarding do papel escolhido.
-export function useChooseRoleForm(onChosen?: (role: UserRole) => void) {
-  const queryClient = useQueryClient();
-  const form = useForm<ChooseRoleInput>({
-    resolver: zodResolver(chooseRoleSchema),
-    defaultValues: {
-      role: undefined,
-      phone: '',
-      termsAccepted: false,
-      minorDataConsent: false,
-    },
-  });
-
-  const mutation = useMutation({
-    mutationFn: (values: ChooseRoleInput) =>
-      completeRoleChoice({ role: values.role, phone: values.phone }),
-    onSuccess: async (_data, values) => {
-      await queryClient.invalidateQueries({ queryKey: profileKeys.all });
-      onChosen?.(values.role);
-    },
-  });
-
-  return {
-    control: form.control,
-    setRole: (role: UserRole) => form.setValue('role', role, { shouldValidate: true }),
-    submit: () => form.handleSubmit((values) => mutation.mutate(values))(),
-    isSubmitting: mutation.isPending,
-    errorMessage: mutation.error ? getAuthErrorMessage(mutation.error) : null,
-  };
 }

@@ -8,7 +8,6 @@ import { Logo } from '@/components/ui/logo';
 import { Screen } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
 import type { AuthRepository } from '@/features/auth/api';
-import { GoogleSignInButton } from '@/features/auth/components/google-sign-in-button';
 import { useSignInForm } from '@/features/auth/hooks';
 import { colors, spacing } from '@/theme';
 
@@ -72,8 +71,6 @@ export default function SignInScreen({ repository }: SignInScreenProps = {}) {
       ) : null}
 
       <Button title="Entrar" loading={isSubmitting} onPress={submit} />
-
-      <GoogleSignInButton />
 
       <View style={styles.spacer} />
 

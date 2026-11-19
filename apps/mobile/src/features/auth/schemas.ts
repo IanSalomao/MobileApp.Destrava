@@ -43,21 +43,7 @@ export const signUpSchema = z
     message: MINOR_DATA_REQUIRED_MESSAGE,
   });
 
-// Escolha de papel de quem entrou pelo Google (RNF06): papel, celular e o mesmo aceite do cadastro.
-export const chooseRoleSchema = z
-  .object({
-    role: z.enum(USER_ROLES, { message: 'Escolha como você vai usar o Destrava.' }),
-    phone: z.string().trim().refine(isValidBRPhone, 'Informe um celular válido com DDD.'),
-    termsAccepted: z.boolean().refine((accepted) => accepted, { message: TERMS_REQUIRED_MESSAGE }),
-    minorDataConsent: z.boolean(),
-  })
-  .refine((data) => data.role !== 'guardian' || data.minorDataConsent, {
-    path: ['minorDataConsent'],
-    message: MINOR_DATA_REQUIRED_MESSAGE,
-  });
-
 export type SignInInput = z.infer<typeof signInSchema>;
-export type ChooseRoleInput = z.infer<typeof chooseRoleSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 

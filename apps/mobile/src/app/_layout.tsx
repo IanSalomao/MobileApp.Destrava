@@ -4,7 +4,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { canAccess, homeHref } from '@/features/auth/route-access';
+import { AccountUnavailable } from '@/features/auth/components/account-unavailable';
+import { useSignOut } from '@/features/auth/hooks';
+import { canAccess, hasKnownRole, homeHref } from '@/features/auth/route-access';
 import { SessionProvider, useSession } from '@/features/auth/session-provider';
 import { useMyProfile } from '@/features/profile/hooks';
 import { queryClient } from '@/lib/query-client';
@@ -40,6 +42,7 @@ export default function RootLayout() {
 function RootNavigator() {
   const { session, isLoading } = useSession();
   const profile = useMyProfile();
+  const signOut = useSignOut();
 
   // Com sessão, a guarda por papel precisa do perfil: espera ele carregar antes de montar as rotas.
   const isResolvingRole = !!session && profile.isPending;
@@ -52,6 +55,16 @@ function RootNavigator() {
   if (!isReady) return null;
 
   const access = { isSignedIn: !!session, role: profile.data?.role };
+
+  if (!hasKnownRole(access)) {
+    return (
+      <AccountUnavailable
+        onRetry={() => profile.refetch()}
+        isRetrying={profile.isFetching}
+        onSignOut={() => signOut.mutate()}
+      />
+    );
+  }
   // Quem cai numa área barrada vai para o início do próprio papel (logado) ou para a escolha de
   // perfil (deslogado). Veja `homeHref`.
   const home = homeHref(access);

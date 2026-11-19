@@ -10,7 +10,7 @@ import { colors, radius, spacing } from '@/theme';
 
 // AUT-01: primeira tela do app para quem não está logado (RF03). A escolha segue para o cadastro já
 // com o perfil definido (/sign-up?role=guardian|teacher); quem já tem conta vai para o login.
-export const ROLE_OPTIONS: {
+const ROLE_OPTIONS: {
   role: UserRole;
   title: string;
   hint: string;
