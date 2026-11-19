@@ -2,7 +2,7 @@
 
 **Conectando professores de reforço escolar a pais próximos.**
 
-> **Status:** MVP em desenvolvimento. Este repositório reúne o **aplicativo mobile** e o **backend no Supabase** do Destrava, além da documentação de planejamento ([apresentação](DESTRAVA.pdf) e [Business Model Canvas](DESTRAVA.png)). O app já tem cadastro, login e o onboarding de responsáveis e professores, e o banco tem o schema de todas as funcionalidades do MVP. As demais telas já existem como rotas provisórias, com a navegação funcionando e o nome de quem vai desenvolver cada uma (veja [Divisão das telas do MVP](#divisão-das-telas-do-mvp)).
+> **Status:** MVP em desenvolvimento. Este repositório reúne o **aplicativo mobile** e o **backend no Supabase** do Destrava, além da documentação de planejamento ([apresentação](DESTRAVA.pdf) e [Business Model Canvas](DESTRAVA.png)). Todas as telas do MVP estão desenvolvidas (veja [Divisão das telas do MVP](#divisão-das-telas-do-mvp)), e o banco tem o schema de todas as funcionalidades. Alguns itens saíram do escopo na entrega; veja "Cortes de escopo" em [Requisitos funcionais](#requisitos-funcionais).
 
 ## O que é
 
@@ -274,7 +274,6 @@ src/
   features/<feature>/   # um domínio do negócio: dados, regras, estado e componentes próprios
   components/ui/        # design system: Button, Text, TextField, Screen, TeacherCard, Banner...
   components/form/      # campos do components/ui ligados ao react-hook-form
-  components/scaffold/  # PROVISÓRIO: tela das rotas que ainda não foram desenvolvidas
   lib/                  # infraestrutura sem regra de negócio: Supabase, Storage, seletor de arquivos, máscaras
   theme/                # tokens de cor, espaçamento, raio e tipografia
 ```
@@ -359,13 +358,12 @@ features/contact-requests/
 - **Sem camadas de reexportação nem pastas genéricas** (`shared/`, `utils/`, `helpers/`): importe direto do arquivo, com o alias `@/`. Se duas features precisam da mesma coisa, ela desce para `components/ui`, `lib/` ou `theme/`.
 - **Testes ao lado do arquivo** (`api.test.ts`, `button.test.tsx`). A pasta `__tests__/` fica para testes que cruzam vários arquivos, como os de navegação em `features/auth/__tests__`. Ao cobrir o `api.ts` e o `hooks.ts` de uma feature, inclua os dois no `collectCoverageFrom` e no `coverageThreshold` do `jest.config.js`.
 - **Schema muda só por migração** (veja [Mudando o banco](#mudando-o-banco)), com RLS na mesma migração e os tipos regenerados junto.
-- **Quando a última tela provisória for desenvolvida**, apague `components/scaffold/`.
 
 ## Divisão das telas do MVP
 
 Cada pessoa ficou com uma fatia vertical: as telas de um fluxo e as features que elas usam (api, hooks e componentes). Assim cada um trabalha em pastas diferentes e os conflitos de merge ficam raros. Eram 24 telas: a busca tem 4, por concentrar a lógica mais pesada (RPC, paginação, filtros compartilhados entre telas e o limite de 2 s do RNF01), e as outras fatias tinham 5. Com os cortes de escopo de 19/11/2026 (veja "Requisitos funcionais") saíram as notificações, a gestão da assinatura (com o cartão) e a escolha de papel do login com Google, e ficaram 20.
 
-As rotas já existem. Cada uma mostra no centro o nome do responsável e, embaixo, botões para as telas seguintes do fluxo, para dar para navegar pelo app inteiro desde já. Para começar a sua tela, troque o conteúdo do arquivo da rota pela tela de verdade, mantendo a rota e a navegação. A coluna "Protótipo" é o nome da tela exportada do Figma.
+Todas as telas abaixo estão desenvolvidas. As rotas começaram como telas provisórias, com o nome de quem ia desenvolvê-las, e cada pessoa trocou o conteúdo pela tela de verdade mantendo a rota e a navegação. A coluna "Protótipo" é o nome da tela exportada do Figma.
 
 ```mermaid
 flowchart TD

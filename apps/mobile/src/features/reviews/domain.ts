@@ -56,3 +56,28 @@ export function toReview(row: ReviewRow): Review {
     updatedAt: row.updated_at,
   };
 }
+
+/** Estrelas da nota para exibição (ex.: 4 → "★★★★☆"). Arredonda e limita entre 0 e 5. */
+export function formatStars(rating: number): string {
+  const filled = Math.min(MAX_RATING, Math.max(0, Math.round(rating)));
+  return '★'.repeat(filled) + '☆'.repeat(MAX_RATING - filled);
+}
+
+/** Nota média com vírgula (ex.: 4.85 → "4,9"); "—" sem avaliações. */
+export function formatAverage(average: number | null): string {
+  return average === null ? '—' : average.toFixed(1).replace('.', ',');
+}
+
+/** "1 avaliação" / "12 avaliações". */
+export function formatReviewCount(count: number): string {
+  return count === 1 ? '1 avaliação' : `${count} avaliações`;
+}
+
+/** Data curta da avaliação (ex.: "18 de nov. de 2026"). */
+export function formatReviewDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
