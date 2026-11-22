@@ -6,6 +6,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Banner } from '@/components/ui/banner';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { FavoriteButton } from '@/features/favorites/components/favorite-button';
 import { PublicTeacherProfileView } from '@/features/teachers/public-profile/components/public-teacher-profile-view';
 import { useMyProfile } from '@/features/profile/hooks';
 import { buildTeacherContactMessage } from '@/features/teachers/public-profile/domain';
@@ -82,6 +83,7 @@ export default function TeacherProfileScreen() {
       onSeeReviews={() =>
         router.push({ pathname: '/reviews/[teacherId]', params: { teacherId: id } })
       }
+      headerAction={<FavoriteButton teacherId={profile.data.id} />}
       contact={contact.data}
       contactError={contactError}
       onSeeRequest={(requestId) =>
