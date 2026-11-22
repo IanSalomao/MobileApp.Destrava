@@ -35,6 +35,8 @@ type PublicTeacherProfileViewProps = {
   onWriteReview?: () => void;
   /** Erro ao abrir o WhatsApp ou a rede social. */
   contactError?: string | null;
+  /** Ação ao lado do nome, como o coração de favorito. A tela decide o que colocar. */
+  headerAction?: ReactNode;
 };
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -72,6 +74,7 @@ export function PublicTeacherProfileView({
   onOpenSocialLink,
   onWriteReview,
   contactError,
+  headerAction,
 }: PublicTeacherProfileViewProps) {
   const location = formatLocation(profile.neighborhood, profile.cityName, profile.state);
   const tutoringTypes = formatTutoringTypes(profile.tutoringTypes);
@@ -100,6 +103,7 @@ export function PublicTeacherProfileView({
               </Text>
             ) : null}
           </View>
+          {headerAction}
         </View>
 
         <View style={styles.summaryCard}>

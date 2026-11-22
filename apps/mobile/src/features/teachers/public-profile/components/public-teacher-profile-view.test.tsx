@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Text } from 'react-native';
 
 import type { PublicTeacherProfile } from '../types';
 import { PublicTeacherProfileView } from './public-teacher-profile-view';
@@ -95,5 +96,30 @@ describe('PublicTeacherProfileView', () => {
     expect(screen.getByText('Valor a combinar')).toBeTruthy();
     expect(screen.queryByText('Ver todas as avaliações')).toBeNull();
     expect(screen.queryByText('Sobre')).toBeNull();
+  });
+
+  it('mostra a ação do cabeçalho (coração de favorito) quando a tela envia', async () => {
+    await render(
+      <PublicTeacherProfileView
+        profile={profile}
+        onRequestContact={jest.fn()}
+        onSeeReviews={jest.fn()}
+        headerAction={<Text>coração</Text>}
+      />,
+    );
+
+    expect(screen.getByText('coração')).toBeTruthy();
+  });
+
+  it('não reserva espaço no cabeçalho quando não há ação', async () => {
+    await render(
+      <PublicTeacherProfileView
+        profile={profile}
+        onRequestContact={jest.fn()}
+        onSeeReviews={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('coração')).toBeNull();
   });
 });
