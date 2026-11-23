@@ -23,6 +23,9 @@ export type MyRequestCardProps = {
 };
 
 // Card da lista "Minhas solicitações" (RF14).
+// O botão do WhatsApp fica fora da área clicável do card: no web o Pressable com papel de
+// botão vira <button>, e um botão dentro de outro é HTML inválido. No celular, um elemento
+// acessível dentro de outro também some do leitor de tela.
 export function MyRequestCard({
   request,
   status,
@@ -33,57 +36,77 @@ export function MyRequestCard({
   const showWhatsApp = status === 'accepted' && Boolean(request.teacherPhone) && onOpenWhatsApp;
 
   return (
-    <Pressable
-      testID={testID}
-      accessibilityRole="button"
-      accessibilityLabel={`Pedido para ${request.teacherName}`}
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-    >
-      <View style={styles.headerRow}>
-        <Avatar name={request.teacherName} imageUrl={request.teacherAvatarUrl} size="lg" />
+    <View style={styles.card}>
+      <Pressable
+        testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={`Pedido para ${request.teacherName}`}
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.body,
+          showWhatsApp ? styles.bodyAboveActions : null,
+          pressed && styles.bodyPressed,
+        ]}
+      >
+        <View style={styles.headerRow}>
+          <Avatar name={request.teacherName} imageUrl={request.teacherAvatarUrl} size="lg" />
 
-        <View style={styles.info}>
-          <Text variant="label" numberOfLines={1}>
-            {request.teacherName}
-          </Text>
-          <Text variant="caption" color="textMuted" numberOfLines={1}>
-            Para {request.studentName} · {SCHOOL_GRADE_SHORT_LABELS[request.schoolGrade]}
-          </Text>
+          <View style={styles.info}>
+            <Text variant="label" numberOfLines={1}>
+              {request.teacherName}
+            </Text>
+            <Text variant="caption" color="textMuted" numberOfLines={1}>
+              Para {request.studentName} · {SCHOOL_GRADE_SHORT_LABELS[request.schoolGrade]}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <Text variant="caption" color="textSecondary" numberOfLines={2}>
-        “{request.reason.trim()}”
-      </Text>
+        <Text variant="caption" color="textSecondary" numberOfLines={2}>
+          “{request.reason.trim()}”
+        </Text>
 
-      <View style={styles.footerRow}>
-        <MyRequestStatusPill status={status} />
+        <View style={styles.footerRow}>
+          <MyRequestStatusPill status={status} />
 
-        <View style={styles.timeRow}>
-          <Ionicons name="time-outline" size={14} color={colors.textMuted} />
-          <Text variant="caption" color="textMuted">
-            {formatRelativeTime(request.createdAt)}
-          </Text>
+          <View style={styles.timeRow}>
+            <Ionicons name="time-outline" size={14} color={colors.textMuted} />
+            <Text variant="caption" color="textMuted">
+              {formatRelativeTime(request.createdAt)}
+            </Text>
+          </View>
         </View>
-      </View>
+      </Pressable>
 
-      {showWhatsApp ? <WhatsAppButton onPress={onOpenWhatsApp} /> : null}
-    </Pressable>
+      {showWhatsApp ? (
+        <View style={styles.actions}>
+          <WhatsAppButton onPress={onOpenWhatsApp} />
+        </View>
+      ) : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    gap: spacing.sm,
-    padding: spacing.md,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  cardPressed: {
+  body: {
+    gap: spacing.sm,
+    padding: spacing.md,
+  },
+  // Com o botão embaixo, o espaço até ele é o mesmo `gap` entre as linhas do card.
+  bodyAboveActions: {
+    paddingBottom: spacing.sm,
+  },
+  bodyPressed: {
     opacity: 0.92,
+  },
+  actions: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
   },
   headerRow: {
     flexDirection: 'row',

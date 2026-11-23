@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, within } from '@testing-library/react-native';
 
 import type { MyContactRequest } from '../types';
 import { MyRequestCard } from './my-request-card';
@@ -66,6 +66,23 @@ describe('MyRequestCard', () => {
 
     expect(onOpenWhatsApp).toHaveBeenCalledTimes(1);
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('o botão do WhatsApp fica fora da área clicável do card (sem botão dentro de botão)', async () => {
+    await render(
+      <MyRequestCard
+        request={ACCEPTED}
+        status="accepted"
+        onPress={onPress}
+        onOpenWhatsApp={onOpenWhatsApp}
+        testID="card"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Conversar no WhatsApp' })).toBeTruthy();
+    expect(
+      within(screen.getByTestId('card')).queryByRole('button', { name: 'Conversar no WhatsApp' }),
+    ).toBeNull();
   });
 
   it('não mostra o WhatsApp se a solicitação não foi aceita', async () => {
