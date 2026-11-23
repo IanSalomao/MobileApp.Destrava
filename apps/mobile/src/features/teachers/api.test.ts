@@ -47,6 +47,7 @@ const PARAMS: SaveTeacherProfileParams = {
   cpf: '529.982.247-25',
   state: 'SP',
   cityId: 3550308,
+  neighborhood: 'Pinheiros',
   subjectIds: ['math'],
   languageIds: ['pt', 'en'],
   bio: '  Aulas práticas.  ',
@@ -85,6 +86,7 @@ describe('updateTeacherProfile', () => {
           available_periods: ['morning'],
           state: 'SP',
           city_id: 3550308,
+          neighborhood: 'Pinheiros',
         },
       ],
     });

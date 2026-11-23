@@ -127,6 +127,15 @@ export function TeacherProfileForm({ vm }: TeacherProfileFormProps) {
               searchPlaceholder="Buscar cidade"
             />
           ) : null}
+          {vm.showCityField ? (
+            <FormTextField
+              control={vm.control}
+              name="neighborhood"
+              label="Bairro"
+              placeholder="Ex.: Pinheiros, Kalilândia, Savassi..."
+              autoCapitalize="words"
+            />
+          ) : null}
           <FilePickerField
             title="Documento com foto"
             hint="RG ou CNH em PDF, JPG ou PNG"

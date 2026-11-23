@@ -62,6 +62,7 @@ export function toTeacherProfileFormValues(profile: MyTeacherProfile): TeacherPr
     // O schema exige estado e cidade; nulos ficam vazios até o professor escolher.
     state: profile.state ?? (undefined as unknown as TeacherProfileInput['state']),
     cityId: profile.cityId ?? (undefined as unknown as number),
+    neighborhood: profile.neighborhood ?? '',
     subjectIds: profile.subjects.map((subject) => subject.id),
     languageIds: profile.languages.map((language) => language.id),
     bio: profile.bio ?? '',
