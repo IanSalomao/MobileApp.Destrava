@@ -11,7 +11,7 @@ const PUBLIC_PROFILE_SELECT = `
   id, bio, hourly_rate_cents, tutoring_types, education_levels,
   available_weekdays, available_periods, neighborhood, state,
   rating_average, rating_count,
-  profiles ( full_name, avatar_url ),
+  profiles!teachers_id_fkey ( full_name, avatar_url ),
   cities!teachers_city_fkey ( name ),
   teacher_subjects ( subjects ( id, name, sort_order ) ),
   teacher_languages ( languages ( id, name, sort_order ) )
