@@ -1,5 +1,5 @@
 import { skipToken, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as Linking from 'expo-linking';
+import { openWhatsAppUrl } from '@/lib/whatsapp';
 import { useState } from 'react';
 
 import { useSession } from '@/features/auth/session-provider';
@@ -98,7 +98,7 @@ export function useOpenTeacherWhatsApp() {
     }
 
     try {
-      await Linking.openURL(url);
+      await openWhatsAppUrl(url);
     } catch {
       setErrorMessage('Não foi possível abrir o WhatsApp.');
     }

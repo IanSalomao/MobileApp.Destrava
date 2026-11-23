@@ -25,7 +25,7 @@ import { SCHOOL_GRADE_LABELS } from '@/features/catalog/types';
 import { useMyProfile } from '@/features/profile/hooks';
 import { formatDateTime } from '@/lib/date';
 import { formatRelativeTime } from '@/lib/relative-time';
-import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { buildWhatsAppUrl, openWhatsAppUrl } from '@/lib/whatsapp';
 import { colors, radius, spacing } from '@/theme';
 
 type DisplayStatus = 'pending' | RequestDetailStatus;
@@ -152,7 +152,7 @@ export default function ReceivedRequestDetailScreen() {
     }
 
     try {
-      await Linking.openURL(url);
+      await openWhatsAppUrl(url);
     } catch {
       setLinkError('Não foi possível abrir o WhatsApp.');
     }

@@ -14,7 +14,7 @@ import {
   usePublicTeacherProfile,
   useTeacherContact,
 } from '@/features/teachers/public-profile/hooks';
-import { buildWhatsAppUrl } from '@/lib/whatsapp';
+import { buildWhatsAppUrl, openWhatsAppUrl } from '@/lib/whatsapp';
 import { colors, spacing } from '@/theme';
 
 // Perfil público do professor, visto pelo responsável: verificação, nota média e total de
@@ -35,7 +35,7 @@ export default function TeacherProfileScreen() {
       return;
     }
     try {
-      await Linking.openURL(url);
+      await openWhatsAppUrl(url);
     } catch {
       setContactError(failure);
     }
