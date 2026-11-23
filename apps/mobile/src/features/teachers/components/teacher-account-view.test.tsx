@@ -15,6 +15,7 @@ const profile: MyTeacherProfile = {
   state: 'SP',
   cityId: 3550308,
   cityName: 'São Paulo',
+  neighborhood: 'Pinheiros',
   isPublished: true,
   ratingAverage: 4.9,
   ratingCount: 12,

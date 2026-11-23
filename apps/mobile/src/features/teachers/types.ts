@@ -20,6 +20,7 @@ export type MyTeacherProfile = {
   state: Enums<'brazilian_state'> | null;
   cityId: number | null;
   cityName: string | null;
+  neighborhood: string | null;
   isPublished: boolean;
   ratingAverage: number | null;
   ratingCount: number;

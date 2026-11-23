@@ -14,6 +14,11 @@ export const teacherProfileSchema = z.object({
   // Estado e cidade vêm de listas predefinidas: enum brazilian_state e tabela cities (IBGE).
   state: z.enum(BRAZILIAN_STATES, { message: 'Selecione o estado.' }),
   cityId: z.number({ message: 'Selecione a cidade.' }).int(),
+  neighborhood: z
+    .string()
+    .trim()
+    .min(2, 'Informe seu bairro.')
+    .max(80, 'Use no máximo 80 caracteres.'),
   subjectIds: z.array(z.string()).min(1, 'Selecione ao menos uma matéria.'),
   languageIds: z.array(z.string()).min(1, 'Selecione ao menos um idioma.'),
   bio: z.string().trim().max(1000, 'Use no máximo 1000 caracteres.').optional(),
@@ -46,7 +51,7 @@ export type TeacherProfileInput = z.infer<typeof teacherProfileSchema>;
 
 // Campos validados ao avançar cada etapa do formulário.
 export const TEACHER_STEP_FIELDS = {
-  1: ['fullName', 'cpf', 'state', 'cityId'],
+  1: ['fullName', 'cpf', 'state', 'cityId', 'neighborhood'],
   2: ['subjectIds', 'languageIds', 'bio', 'socialNetwork', 'socialUrl'],
   3: ['tutoringTypes', 'hourlyRate', 'weekdays', 'periods'],
 } as const satisfies Record<number, readonly (keyof TeacherProfileInput)[]>;

@@ -46,6 +46,7 @@ const EMPTY_VALUES: TeacherProfileInput = {
   cpf: '',
   state: undefined as unknown as TeacherProfileInput['state'],
   cityId: undefined as unknown as number,
+  neighborhood: '',
   subjectIds: [],
   languageIds: [],
   bio: '',
@@ -105,6 +106,7 @@ export function useTeacherProfileForm(
     if (previousStateRef.current === selectedState) return;
     previousStateRef.current = selectedState;
     form.setValue('cityId', undefined as unknown as number);
+    form.setValue('neighborhood', '');
   }, [selectedState, form]);
 
   const cities = useCities(selectedState);
@@ -201,6 +203,7 @@ export function useTeacherProfileForm(
         cpf: values.cpf,
         state: values.state,
         cityId: values.cityId,
+        neighborhood: values.neighborhood,
         subjectIds: values.subjectIds,
         languageIds: values.languageIds,
         bio: values.bio,

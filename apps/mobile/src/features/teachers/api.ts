@@ -59,6 +59,7 @@ export type SaveTeacherProfileParams = {
   state: Enums<'brazilian_state'>;
   /** Código IBGE do município (public.cities), do mesmo estado de state. */
   cityId: number;
+  neighborhood: string;
   subjectIds: string[];
   languageIds: string[];
   bio?: string;
@@ -155,6 +156,7 @@ async function saveTeacherProfileData(
       available_periods: params.periods,
       state: params.state,
       city_id: params.cityId,
+      neighborhood: params.neighborhood.trim(),
     })
     .eq('id', teacherId);
   if (teacherError) throw teacherError;
@@ -220,7 +222,7 @@ export async function updateTeacherProfile(
 // Embed explícito: teachers e profiles também se ligam por favorite_teachers.
 const MY_TEACHER_PROFILE_SELECT = `
   id, bio, hourly_rate_cents, tutoring_types, available_weekdays, available_periods,
-  state, city_id, is_published, rating_average, rating_count,
+  state, city_id,neighborhood, is_published, rating_average, rating_count,
   profiles!teachers_id_fkey ( full_name, avatar_url ),
   cities!teachers_city_fkey ( name ),
   teacher_subjects ( subjects ( id, name, sort_order ) ),
@@ -241,6 +243,7 @@ type MyTeacherProfileRow = {
   available_periods: Enums<'day_period'>[];
   state: Enums<'brazilian_state'> | null;
   city_id: number | null;
+  neighborhood: string | null;
   is_published: boolean;
   rating_average: number | null;
   rating_count: number;
@@ -279,6 +282,7 @@ export function toMyTeacherProfile(row: MyTeacherProfileRow): MyTeacherProfile {
     periods: row.available_periods,
     state: row.state,
     cityId: row.city_id,
+    neighborhood: row.neighborhood,
     cityName: row.cities?.name ?? null,
     isPublished: row.is_published,
     ratingAverage: row.rating_average === null ? null : Number(row.rating_average),
