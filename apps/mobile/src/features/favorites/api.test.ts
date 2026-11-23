@@ -50,10 +50,13 @@ describe('listFavoriteTeachers', () => {
       },
     ];
     const order = jest.fn().mockResolvedValue({ data, error: null });
-    mockFrom.mockReturnValue({ select: jest.fn().mockReturnValue({ order }) });
+    const select = jest.fn().mockReturnValue({ order });
+    mockFrom.mockReturnValue({ select });
 
     const result = await listFavoriteTeachers();
 
+    // Sem a FK explícita o embed é ambíguo (favorite_teachers também liga teachers e profiles).
+    expect(select).toHaveBeenCalledWith(expect.stringContaining('profiles!teachers_id_fkey'));
     expect(order).toHaveBeenCalledWith('created_at', { ascending: false });
     expect(result[0]).toMatchObject({ id: 't1', fullName: 'Ana Souza', hourlyRateCents: 5000 });
   });

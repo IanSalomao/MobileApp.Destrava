@@ -7,11 +7,13 @@ import type { FavoriteTeacher } from './types';
 // responsável lê e altera só os próprios favoritos; guardian_id vem do default auth.uid().
 // Deixa o erro do Supabase subir (quem traduz é o hook).
 
+// O embed teachers → profiles precisa da FK explícita: favorite_teachers também liga as duas
+// tabelas e, sem a dica, o PostgREST recusa a consulta (PGRST201).
 const FAVORITES_SELECT = `
   created_at,
   teachers (
     id, hourly_rate_cents, rating_average, rating_count,
-    profiles ( full_name, avatar_url ),
+    profiles!teachers_id_fkey ( full_name, avatar_url ),
     teacher_subjects ( subjects ( name, sort_order ) )
   )
 `;
